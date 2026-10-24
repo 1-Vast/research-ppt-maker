@@ -1,0 +1,4 @@
+interface:
+  display_name: "科研 PPT 制作"
+  short_description: "从论文或项目自行检索，深入解释机制、创新与证据，制作美观直观的科研 PPT"
+  default_prompt: "用 $research-ppt-maker 根据论文或项目自行检索并制作科研 PPT，深入解释设计机制、创新差异与证据边界；单篇论文默认 4–5 页，保留来源、美观和直观表达，只交付 PPT，不要讲稿。"
