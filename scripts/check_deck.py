@@ -18,7 +18,7 @@ def walk(shapes):
             yield from walk(shape.shapes)
 
 
-def inspect(deck: Path) -> dict:
+def inspect(deck: Path, min_pt: float = 12) -> dict:
     with zipfile.ZipFile(deck) as archive:
         bad = archive.testzip()
         if bad:
@@ -47,7 +47,7 @@ def inspect(deck: Path) -> dict:
                 for paragraph in frame.paragraphs:
                     for run in paragraph.runs:
                         size = run.font.size or paragraph.font.size
-                        if size and size.pt < 16 and run.text.strip():
+                        if size and size.pt < min_pt and run.text.strip():
                             small.append(dict(shape_id=shape.shape_id, points=round(size.pt, 1), text=run.text[:90]))
         slides.append(dict(slide=number, editable_objects=editable,
                            out_of_bounds_candidates=outside, small_font_candidates=small))
@@ -61,9 +61,10 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('deck', type=Path)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--min-pt', type=float, default=12, help='flag explicit font sizes below this')
     args = parser.parse_args(argv)
     try:
-        result = inspect(args.deck.resolve())
+        result = inspect(args.deck.resolve(), args.min_pt)
         if not result['slide_count']:
             raise ValueError('No slides in presentation')
     except Exception as exc:

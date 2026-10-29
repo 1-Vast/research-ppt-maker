@@ -1,4 +1,4 @@
 interface:
   display_name: "科研 PPT 制作"
-  short_description: "从论文或项目自行检索，深入解释机制、创新与证据，制作美观直观的科研 PPT"
-  default_prompt: "用 $research-ppt-maker 根据论文或项目自行检索并制作科研 PPT，深入解释设计机制、创新差异与证据边界；单篇论文默认 4–5 页，保留来源、美观和直观表达，只交付 PPT，不要讲稿。"
+  short_description: "自行检索论文或项目，制作 Claude 式克制风格的科研 PPT：单篇 4–5 页讲清背景、方法与创新，标题页附论文首页"
+  default_prompt: "用 $research-ppt-maker 根据论文或项目自行检索并制作科研 PPT：单篇论文 4–5 页（标题页含论文首页截图、背景与问题、方法与实现、关键创新、可选的精简证据），用 build_deck.py 的象牙白—陶土色版式，讲清因果链、实验从简，只交付 PPT，不要讲稿。"
