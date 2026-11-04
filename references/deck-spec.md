@@ -17,8 +17,9 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json" -o "OUT/主题-完
 |---|---|
 | `lang` | `zh`（默认）或 `en`；决定页眉、栏目标签和换行规则；中文默认使用研究背景/方法框架/方法创新/实验结果等学术栏目 |
 | `output` | 输出 `.pptx` 路径 |
+| `compact_text` | 可选布尔值，默认 `false`。获准使用稍小字号时设为 `true`，标题与主要正文的起始字号下调 1.5 pt，保留各角色下限，正文最低 13 pt。 |
 | `cite` | 页脚出处，如 `Lipman et al., ICLR 2023 · arXiv:2210.02747`；`cover` 里的 `cite` 会覆盖本组后续页 |
-| `slides` | 按顺序排列的页面；每个 `cover` 开启一组新论文，进度条按组重置 |
+| `slides` | 按顺序排列的页面；每个 `cover` 开启一组新论文，进度条按组重置。组内超过五个内容页或重复使用布局时，进度条显示本组页序 |
 
 每页都可用 `eyebrow` 覆盖默认栏目页眉，用 `source` 覆盖本页页脚出处。
 

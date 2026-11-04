@@ -161,8 +161,13 @@ class Deck:
         self.prs.slide_width, self.prs.slide_height = Inches(W), Inches(H)
         self.warnings: list[str] = []
         self.page, self.cite, self.group = 0, spec.get('cite', ''), []
+        self.group_start = 0
+        self.compact_text = spec.get('compact_text', False)
 
     # ---------- primitives ----------
+    def preferred_size(self, size: float, floor: float = FLOOR) -> float:
+        return max(floor, size - 1.5) if self.compact_text else size
+
     def warn(self, message: str) -> None:
         self.warnings.append(f'slide {self.page}: {message}')
 
@@ -332,13 +337,17 @@ class Deck:
     def chrome(self, slide, sd: dict, layout: str) -> float:
         """Draw tracker, eyebrow, title and footer; return the top of the body area."""
         L = self.L
-        if len(self.group) > 1:
+        if len(self.group) > 5 or len(self.group) != len(set(self.group)):
+            tracker = f'**{self.page - self.group_start:02d} / {len(self.group):02d}**'
+            self.text(slide, W - MX - 2, 0.44, 2, tracker, 10.5, color='faint',
+                      emph='clay_deep', align='r', line=1.2)
+        elif len(self.group) > 1:
             names = [f'**{L[k]}**' if k == layout else L[k] for k in self.group]
             self.text(slide, W - MX - 5.2, 0.44, 5.2, '　·　'.join(names), 10.5, color='faint',
                       emph='clay_deep', align='r', line=1.2)
         self.text(slide, MX, 0.44, 7.0, sd.get('eyebrow', L['q_' + layout]), 12, color='clay_deep',
                   spacing=1.2, line=1.2)
-        size, h = self.fit(sd['title'], W - 2 * MX, 0.95, 28, 23, 'title', keep_lines=True,
+        size, h = self.fit(sd['title'], W - 2 * MX, 0.95, self.preferred_size(28, 23), 23, 'title', keep_lines=True,
                            role='serif', line=1.18, gap=0)
         self.text(slide, MX, 0.78, W - 2 * MX, sd['title'], size, role='serif', color='ink', line=1.18, gap=0)
         self.line(slide, MX, 7.0, W - MX, 7.0)
@@ -368,7 +377,7 @@ class Deck:
         x, w, y = 0.8, px - 1.45, 1.0
         if sd.get('eyebrow'):
             y += self.text(slide, x, y, w, sd['eyebrow'], 12, color='clay_deep', spacing=1.2, line=1.2) + 0.3
-        size, h = self.fit(sd['title'], w, 2.45, 36, 28, 'cover title', keep_lines=True, role='serif',
+        size, h = self.fit(sd['title'], w, 2.45, self.preferred_size(36, 28), 28, 'cover title', keep_lines=True, role='serif',
                            line=1.16, gap=0)
         y += self.text(slide, x, y, w, sd['title'], size, role='serif', color='ink', line=1.16, gap=0) + 0.24
         if sd.get('original_title'):
@@ -377,7 +386,7 @@ class Deck:
         if meta:
             y += self.text(slide, x, y, w, meta, 12, color='muted', line=1.4, gap=0.2)
         if sd.get('idea'):
-            size, h = self.fit(sd['idea'], w, 1.9, 18, 15, 'cover idea', line=1.5)
+            size, h = self.fit(sd['idea'], w, 1.9, self.preferred_size(18, 15), 15, 'cover idea', line=1.5)
             top = 6.75 - h
             label_top = top - 0.12 - 12 * 1.2 / 72
             if label_top - 0.2 < y + 0.25:
@@ -440,7 +449,7 @@ class Deck:
                                draw=draw)
             return y - y0 + 0.6
 
-        z = self.largest([context, prior_col, gap_col], 15.5, avail, 'background columns')
+        z = self.largest([context, prior_col, gap_col], self.preferred_size(15.5), avail, 'background columns')
         self.rect(slide, cx, top, cw, avail, 'clay_tint', radius=0.05)  # gap panel spans the body height
         self.rect(slide, cx, top, 0.06, avail, 'clay')
         mid = top + min(avail, max(context(z), prior_col(z))) / 2  # arrows sit beside the content
@@ -496,7 +505,7 @@ class Deck:
         slide = self.new_slide()
         y = self.chrome(slide, sd, 'method')
         if sd.get('lede'):
-            size, h = self.fit(sd['lede'], W - 2 * MX, 0.9, 17, 15, 'method lede', role='serif_text', line=1.42)
+            size, h = self.fit(sd['lede'], W - 2 * MX, 0.9, self.preferred_size(17, 15), 15, 'method lede', role='serif_text', line=1.42)
             y += self.text(slide, MX, y, W - 2 * MX, sd['lede'], size, role='serif_text', color='ink',
                            line=1.42, emph='clay_deep') + 0.28
         lanes = sd.get('lanes') or [dict(steps=sd.get('steps', []))]
@@ -512,7 +521,7 @@ class Deck:
             return sum(self._steps_row(slide, ln['steps'], 0, 0, rows_w, z) for ln in lanes) + \
                 0.26 * (len(lanes) - 1)
 
-        z = self.largest(total, 14.5, area, 'method steps')
+        z = self.largest(total, self.preferred_size(14.5), area, 'method steps')
         ry = y + max(0, (area - total(z)) / 2)
         for lane in lanes:
             rh = self._steps_row(slide, lane['steps'], 0, 0, rows_w, z)
@@ -555,7 +564,7 @@ class Deck:
                                 emph='ink', draw=draw)
             return yy - y
 
-        z = self.largest(column, 14.5, BOTTOM - y - (fh + 0.28 if fh else 0), 'method steps')
+        z = self.largest(column, self.preferred_size(14.5), BOTTOM - y - (fh + 0.28 if fh else 0), 'method steps')
         column(z, True)
         if fh:
             self._formula(slide, sd['formula'], sx, BOTTOM - fh, sw, True)
@@ -593,7 +602,7 @@ class Deck:
                 y += rh
             return y - top
 
-        z = self.largest(rows, 15, BOTTOM - top - summary_h, 'innovation rows')
+        z = self.largest(rows, self.preferred_size(15), BOTTOM - top - summary_h, 'innovation rows')
         body_h = rows(z)
         self.rect(slide, c3, top - 0.08, w3, body_h + 0.16, 'clay_tint', radius=0.05)
         self.label(slide, c1, top, w1, L['innov'], color='muted')
@@ -608,7 +617,7 @@ class Deck:
 
     def _table(self, slide, spec, x, y, w, row_h) -> float:
         cols, rows = spec['columns'], spec['rows']
-        size = min(16, max(13, row_h * 72 / 2.3))  # taller rows get larger, easier-to-read figures
+        size = self.preferred_size(min(16, max(FLOOR, row_h * 72 / 2.3)))  # taller rows get larger, easier-to-read figures
         hot = spec.get('highlight_row')
         widths = spec.get('widths') or [2.2] + [1] * (len(cols) - 1)
         frame = slide.shapes.add_table(len(rows) + 1, len(cols), Inches(x), Inches(y), Inches(w),
@@ -730,7 +739,7 @@ class Deck:
                 y += 0.3 + bh
             return y - top
 
-        column(self.largest(column, 15, BOTTOM - top, 'evidence column'), True)
+        column(self.largest(column, self.preferred_size(15), BOTTOM - top, 'evidence column'), True)
 
     # ---------- build ----------
     def build(self, out: Path) -> None:
@@ -741,6 +750,7 @@ class Deck:
                 raise ValueError(f'slide {i + 1}: unknown layout {layout!r}')
             if layout == 'cover' or i == 0:
                 end = next((j for j in range(i + 1, len(slides)) if slides[j].get('layout') == 'cover'), len(slides))
+                self.group_start = i + int(layout == 'cover')
                 self.group = [s['layout'] for s in slides[i:end] if s['layout'] != 'cover']
             getattr(self, layout)(sd)
         out.parent.mkdir(parents=True, exist_ok=True)
