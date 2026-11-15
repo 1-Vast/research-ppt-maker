@@ -72,7 +72,7 @@ description: Research and build editable, presentation-ready research PPTs from 
 - 靠留白、细线、浅色块和对齐建立层级。不用阴影卡片堆叠、渐变、图标装饰、剪贴画或花哨模板。
 - 方法图要能看出输入、关键变换和输出；数量比较用精简表或单一强调色的条形图；原论文图选关键面板并放大，保留坐标、图例和出处。
 
-**默认用构建脚本生成**，以保证版式一致、文字不溢出：先按 [references/deck-spec.md](references/deck-spec.md) 写规格 JSON，再运行
+**根据教学内容选择制作方式，不允许为了套入五种默认版式破坏讲解。** 简单封面、明确单路径和小表可用现有 `build_deck.py`；领域发展时间线、复杂模型总览、不同机制图、双条件实验对照和综述脉络应使用定制可编辑布局。**默认版式是组件库，不是叙事模板。** 如使用构建脚本，以保证版式一致、文字不溢出：先按 [references/deck-spec.md](references/deck-spec.md) 写规格 JSON，再运行
 
 ```text
 python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
@@ -80,7 +80,7 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 脚本用本机已安装字体测量文字，逐块排版，放不下就逐级缩小到下限并输出 `WARNING`；看到警告就删掉重复内容或拆页后重建。用户允许整体字号略小时，可启用规格里的 `compact_text`。先给关键机制与证据补齐因果链，再适度缩小字号，正文下限仍为 13 pt。标题页的 `first_page` 可直接指向论文 PDF（自动渲染第 1 页）或已截好的首页图片；拿不到 PDF 时用出版社或 arXiv 页面截图，并在说明里注明来源。完整示例见 [examples/flow-matching/spec.json](examples/flow-matching/spec.json)。
 
-五种版式不够用时（如需一页机制放大图），按 deck-spec.md 的“扩展”一节在 Python 中复用同一套配色、字体与页面框架，不另起风格。需要定制机制图时可调用个人技能 [gpt-image-2-research-studio](../gpt-image-2-research-studio/SKILL.md)，无需重复询问：先准备核对过的科学内容和讲解目标，实际生成、查看、修正，再检查嵌入效果；定量结果只用原图或真实数据绘制。
+五种版式不适合当前论文时（尤其发展脉络、复杂方法全景、结果图和综述）应**主动改用自定义布局**，按 deck-spec.md 的“扩展”一节在 Python 中复用同一套配色、字体与页面框架，不另起风格。需要定制机制图时可调用个人技能 [gpt-image-2-research-studio](../gpt-image-2-research-studio/SKILL.md)，无需重复询问：先准备核对过的科学内容和讲解目标，实际生成、查看、修正，再检查嵌入效果；定量结果只用原图或真实数据绘制。
 
 ## 5. 渲染，检查，修正
 
