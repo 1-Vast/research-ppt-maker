@@ -19,7 +19,7 @@
 ## 内容
 
 - `SKILL.md`：技能入口与工作流。
-- `references/`：资料检索、论文讲解、科研叙事、视觉设计及制作验收指导。
+- `references/`：资料检索、论文讲解、**面向听众的中文表达规范**、科研叙事、视觉设计及制作验收指导。
 - `scripts/`：PPT 内容提取、渲染与结构检查辅助工具。
 - `agents/openai.yaml`：技能展示信息。
 - `examples/flow-matching/`：可运行的规格示例和论文首页图片。
@@ -28,6 +28,8 @@
 ## 运行环境
 
 技能说明由 Codex 读取；辅助脚本按需使用 Python。脚本依赖随用途不同，包含 `python-pptx`、Pillow、PyMuPDF，以及可选 OCR 工具。Windows 渲染优先调用已安装的 PowerPoint（需要 `pywin32`）；其他可用后端及具体命令见 `references/build-and-verify.md` 与脚本帮助。
+
+对中文 PPT 可在构建前运行 `python scripts/lint_deck_language.py OUT/work/deck.json`，检查机械审稿栏目和抽象术语；预警仅供改写参考，不代替读原文和人工审阅。特别建议用本仓库 `references/chinese-paper-explanation.md` 的对照实例验收核心思想、方法和实验页。
 
 复杂科研图可选调用同级个人技能 `gpt-image-2-research-studio`；该技能未包含在本仓库。没有该技能时，可用论文原图或可编辑图解继续。
 
