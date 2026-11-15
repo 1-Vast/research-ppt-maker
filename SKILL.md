@@ -1,11 +1,11 @@
 ---
 name: research-ppt-maker
-description: Research and build editable, presentation-ready research PPTs from a paper DOI, title, PDF, or project description. Default look is Claude-style restraint (ivory background, clay accent, serif titles, generous whitespace). One paper fits in 4–5 slides covering title, background (current experimental context, prior work, the specific problem), method and implementation, and key innovations; the title slide carries a screenshot of the paper's first page. Use for 论文直观讲解、科研PPT、组会汇报、项目介绍、PPT补全和美化. Exclude speech-script-only and document-writing tasks.
+description: Research and build editable, presentation-ready research PPTs from a paper DOI, title, PDF, or project description. Default look is Claude-style restraint (ivory background, clay accent, serif titles, generous whitespace). For a paper, choose slide count by teaching difficulty and explain field development, true method computation, primary innovations and interpretable experiments; the title slide carries a screenshot of the paper's first page. Use for 论文直观讲解、科研PPT、组会汇报、项目介绍、PPT补全和美化. Exclude speech-script-only and document-writing tasks.
 ---
 
 # Research PPT Maker · 科研 PPT 制作
 
-从 DOI、论文名、PDF 或项目描述出发，**自行检索资料、读懂内容，交付可以直接汇报的 `.pptx`**；也支持补全、重排和美化已有 PPT。核心能力是讲论文：用 4–5 页让同行看懂“为什么要做、怎么做到、新在哪里”，而不是把摘要和原图搬上屏。
+从 DOI、论文名、PDF 或项目描述出发，**自行检索资料、读懂内容，交付可以直接汇报的 `.pptx`**；也支持补全、重排和美化已有 PPT。核心能力是讲论文：沿“领域发展 → 现实困难 → 论文动机 → 模型总览 → 核心创新机制 → 实验怎么读 → 结论边界”让同行真正理解研究，而不是把摘要和原图搬上屏。
 
 **用户偏好：只要 PPT 本身直观。默认不写讲稿、不注入新备注、不生成 Word 或逐页文稿。** 已有备注作为上下文保留，不主动改写；用户另有明确要求时才扩展交付。
 
@@ -20,9 +20,9 @@ description: Research and build editable, presentation-ready research PPTs from 
 
 ## 2. 检索并读懂论文
 
-先读 [references/paper-research-and-explanation.md](references/paper-research-and-explanation.md) 与 **[references/chinese-paper-explanation.md](references/chinese-paper-explanation.md)**：核对身份与版本，读原文、补充材料和理解所需的直接前作，定位要用的图表与数字。用当前可用的搜索/浏览工具或官方公开接口，不假设必有某个工具。
+先读 **[references/teaching-first-workflow.md](references/teaching-first-workflow.md)**（优先级最高，含背景叙事、主次机制、图证与综述规则）、[references/paper-research-and-explanation.md](references/paper-research-and-explanation.md) 与 [references/chinese-paper-explanation.md](references/chinese-paper-explanation.md)：核对身份与版本，读原文、补充材料和理解所需的直接前作，定位要用的图表与数字。用当前可用的搜索/浏览工具或官方公开接口，不假设必有某个工具。
 
-- 在 `work/` 写简短内容计划：每页回答的问题、核心主张、图中对应位置及来源；背景记录“具体困难—后果—本文设计”，实验记录“待检验主张—检验方式—观察—结论范围”。它是内部资料，不额外交付。
+- 在 `work/` 先写领域发展的背景链和模型解剖表，再写逐页内容计划：观众当前知道什么、需要理解什么、图像证据在哪里、什么是主要创新与辅助模块。**背景不能只是三条技术困难与对应模块；原始方法论文与综述采用不同讲解剧本**（详见 teaching-first-workflow）。审稿用的“待检验主张—对照—指标—边界”只进入内部笔记，不固定显示为 PPT 栏目。
 - 区分原文结论、作者论证、讲解者推断和待验证设想，必要时在页面上用短标签注明。
 - 不编造结果、引用、误差线、显著性、机制箭头或图片含义。生成式插图只能解释概念，不能充当实验数据。
 - 下载论文 PDF 到 `work/sources/`；它同时是标题页首页截图的来源。
@@ -34,16 +34,20 @@ description: Research and build editable, presentation-ready research PPTs from 
 | 页 | 内部规划问题（不必写上页面） | 必含内容 | `layout` |
 |---|---|---|---|
 | 1 标题页 | 这是哪篇论文？ | 中文题名（概括核心改变，可手动换行）、原题、作者与机构、会议/期刊与年份；**论文首页截图**（原始 PDF 第 1 页，兼作出处）；“核心想法”一句话：改变了什么、带来什么 | `cover` |
-| 2 背景与问题 | 为什么需要这项工作？ | ①研究场景：任务的输入/输出、当前的实验或应用情境，尽量配一个具体例子；②已有工作：2–3 条代表路线，写清进展与不足，附作者年份；③研究需求与本文思路：先说明尚缺的能力，再说明本文如何切入，避免重复设问 | `background` |
-| 3 方法与实现 | 它是怎么做的？ | 一句话核心思路，直接回应第 2 页的问题；“输入 → 关键步骤 → 输出”的 3–5 步流程，训练与推断分开画；标出最关键的一步；一个关键公式或实现要点，并解释其中符号 | `method` |
+| 2 背景与问题 | 为什么需要这项工作？ | 从领域起点或测量方式讲到代表性技术进展，解释当下数据/任务为何引出新矛盾，再引出本文的回应。必须有必要的**领域发展脉络**；不要机械罗列“问题 1/2/3 ↔ 模块 1/2/3”。| `background` 或扩展布局 |
+| 3 方法与实现 | 它是怎么做的？ | 清晰完整的**总模型图**：输入、各主要模块真实数据流、训练目标、推理/下游输出；讲清所有模块做什么，但要用高亮区分核心创新与辅助模块。若原图复杂，拆成总览与局部放大，避免字母编号遮住原图。 | `method` 或可编辑总览扩展布局 |
 | 4 关键创新 | 新在哪里？ | 2–3 条，每条比较已有方法与本文改进，说明主要作用；前作回指第 2 页；结尾一句话点明核心贡献 | `innovation` |
-| 5 证据（可选） | 证据说明了什么？ | 一个关键结果（精简表、图或原图面板），注明数据集、基线和指标方向；2–3 条结论分别对应创新点；一句边界 | `evidence` |
+| 5 证据（可选） | 证据说明了什么？ | 用**真实、可读的结果图**教听众比较两个条件/基线，明确横纵轴、样本划分、指标、实际观察及意义。**架构图不能冒充该页实验结果图**；复杂图拆页。| `evidence` 或扩展布局 |
 
 只做 4 页时省去第 5 页，把最关键的一个数字写进第 4 页对应创新的“主要作用”。
+
+**页数选择**：此表仅是紧凑起点；需要领域脉络、模型全景、重要组件放大、训练细节和多个实验时，不能让 4–5 页限制讲解。综述/观点论文另走 teaching-first-workflow 的综述路线，严禁套用“统一网络+消融+效果验证”。
 
 **逻辑衔接。** 中文页眉默认用“研究背景、方法框架、方法创新、实验结果”，主标题给出准确、凝练的学术判断。问题链用于内部组织，不把每页都写成问答模板。第 2 页由“研究需求”过渡到“本文思路”，第 3 页展开实际机制；第 4 页回指前作不足，第 5 页用证据检验主要贡献。相邻栏目分别承担不同信息，不把同一缺口换个问法重复一遍。同一对象全套同名、同色，右上角进度条标出当前位置。
 
 **深度来自因果链，不来自字数。** 每页都要写出“为什么”：现有方法卡在哪个条件上 → 本文改变了数据、表示、目标、交互还是假设中的什么 → 这一改变通过什么路径起作用 → 哪项证据支持它。与最相关的前作在同一维度比较，不把常见模块包装成独有创新；区分结构上提供的路径、训练目标施加的压力和实验证明的实际作用。公式只保留能说明关键条件或目标的一条。
+
+**图像不遮挡硬规则**：论文 Figure 上禁止直接叠加 A/B/C、1/2/3 或遮挡任何模块、文字、箭头、数据点、坐标和图例的标注；用图外标号+细引线/无覆盖裁剪/准确重绘。总览必须让听众追踪实际数据流，不能只是缩小原图+三段概述。证据页必须有该实验的结果图或真实数据重绘，图与旁边结论逐项对应。查看 [teaching-first-workflow.md](references/teaching-first-workflow.md)。
 
 **图解与证据。** 方法讲解沿同一模型图展开，输入、训练和下游读出与图中位置对应；复杂时用总览加局部放大，再分析核心创新，避免图文分离或重复的纯文字流程。实验按待检验主张选取，说明如何用划分、干预或对照检验它，再解释读数与结论范围；不以图号和提升数字代替论证。具体写法见 [research-story-and-visuals.md](references/research-story-and-visuals.md#方法与实现)。
 
@@ -80,15 +84,17 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 ## 5. 渲染，检查，修正
 
+制作前执行两道**内容验收关卡**：先确认有领域发展链、真实模型结构和核心创新排序、实验图证对应及论文类型；再执行逐页语言复写。详见 [teaching-first-workflow.md](references/teaching-first-workflow.md)。
+
 制作前额外执行一次**内容验收**：把每页中“待检验主张、作用路径、读出接口”等内部用语换成明确的操作句；检查封面一句话是否解释了具体任务与技术改变，方法页是否有真正的运算/监督细节。可用 `scripts/lint_deck_language.py` 对规格 JSON 做非阻断预警；该工具不代替人工判断，预警也不自动意味着科学事实错误。
 
 保存后必须重新打开成品，渲染**每一页**并核对页数（命令见 [references/build-and-verify.md](references/build-and-verify.md)）。先看整套缩略总览检查节奏与一致性，再看每页大图；不能用 OCR、对象检查或“脚本跑通”代替视觉检查。逐页检查：
 
 1. 栏目页眉、标题和图证是否一致；不看讲稿能否说出这一页的要点。核心想法与关键解释能否直接找到“什么对象、做了什么、作用是什么”；若只能读到抽象口号，改成具体科研表述。
 2. 文字、公式、坐标和图注在展示尺寸下是否清楚；有无溢出、重叠、孤字成行、行首标点、乱码或字体替换。公式须在实际 PowerPoint 渲染图中核对末尾括号、上下标和行数；脚本零警告不等于公式未换行。长公式优先用符号简写并就近定义，或调整公式区域，不能让末尾项/括号被挤到下一行，也不能省去改变含义的项。
-3. 检查背景的“具体困难—后果—本文设计”是否对应；方法解释能否逐段指到模型图的框、箭头或区域；实验能否定位“检验什么、怎么检验、看哪个读数、观察到什么、支持到哪里”。任一环节只能靠讲稿补足时，先修内容，不用加字或加原图代替。
+3. 检查背景能否看到“领域发展→已有进展→新问题→本文方法”；**不可仅有三条问题清单**。检查完整模型图是否能辨认输入、核心模块、训练/推理、输出；原图上不得覆盖 A/B/C 等标签。检查“具体困难—后果—本文设计”是否对应；方法解释能否逐段指到模型图的框、箭头或区域；实验能否定位“检验什么、怎么检验、看哪个读数、观察到什么、支持到哪里”。任一环节只能靠讲稿补足时，先修内容，不用加字或加原图代替。
 4. 至少一条“设计差异 → 作用路径 → 可检验预期 → 实际证据”能从成品重建；能分清总体性能、机制支持和未验证解释。
-5. 数据、单位、指标方向、基线和引用与原文一致；首页截图来自真实论文，出处清楚。
+5. **实验左图和右侧文字是否在讲同一项实验**；不能以架构图旁列结果数字代替证据图。数据、单位、指标方向、基线和引用与原文一致；首页截图来自真实论文，出处清楚。
 6. 成品可打开、页数完整、文字和表格可编辑；用模板时与原模板对照。
 
 修复后重新渲染受影响页面，内容顺序改变时重查整套。关键问题清零才称为完成；渲染或视觉工具不可用时，保留成品并明确“视觉验收未完成”，不得宣称已逐页验证。
@@ -111,6 +117,7 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 ## 可复用资源
 
+- [teaching-first-workflow.md](references/teaching-first-workflow.md)：**领域发展脉络、模型核心主次、原图无遮挡、实验如何读、原始研究与综述分流（必读）**。
 - [chinese-paper-explanation.md](references/chinese-paper-explanation.md)：**面向听众的中文科研表达规范、翻译腔修订、机制解释与回归案例（必读）**。
 - [deck-spec.md](references/deck-spec.md)：构建脚本的规格格式、字段字数上限与扩展方式。
 - [visual-design.md](references/visual-design.md)：配色、字体、网格、组件与可读性尺度。
