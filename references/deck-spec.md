@@ -1,6 +1,6 @@
 # 构建脚本规格：`scripts/build_deck.py`
 
-规格是一个 UTF-8 JSON 文件，放在 `OUT/work/deck.json`。相对路径（首页、图片、输出）都相对规格文件所在目录解析。
+规格是一个 UTF-8 JSON 文件，放在 `OUT/work/deck.json`。**字段字数是排版建议，不是内容完整性的上限**；如果压缩导致难懂，应拆页而不是使用抽象名词。页面文案先按 [chinese-paper-explanation.md](chinese-paper-explanation.md) 完成人工复写。相对路径（首页、图片、输出）都相对规格文件所在目录解析。
 
 ```text
 python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"            # 输出到规格里的 output
