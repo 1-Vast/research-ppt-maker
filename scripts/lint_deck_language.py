@@ -45,6 +45,8 @@ def fields(value, path=""):
     elif isinstance(value, list):
         for i, child in enumerate(value):
             yield from fields(child, f"{path}[{i}]")
+    elif isinstance(value, str):
+        yield path, value
 
 
 def inspect(spec):
