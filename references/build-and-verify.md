@@ -10,7 +10,7 @@
 python "SKILL_DIR/scripts/lint_deck_language.py" "OUT/work/deck.json"
 ```
 
-它只检查部分易出现“审稿腔”的词和过长句，结果不阻断 PPT 制作；出现警告时回到 [chinese-paper-explanation.md](chinese-paper-explanation.md) 人工改写。没有警告也不能说明幻灯片语言自然、机制讲得清楚。
+它只检查部分易出现“审稿腔”的词和过长句，结果不阻断 PPT 制作；制作前还必须人工审核 [teaching-first-workflow.md](teaching-first-workflow.md) 的领域脉络、总模型图、图证对应和综述类型。出现警告时回到 [chinese-paper-explanation.md](chinese-paper-explanation.md) 人工改写。没有警告也不能说明幻灯片语言自然、机制讲得清楚。
 
 
 **新建论文讲解**默认用构建脚本（依赖 `python-pptx`、Pillow；PDF 首页渲染需要 PyMuPDF）：
@@ -58,7 +58,7 @@ python "SKILL_DIR/scripts/check_deck.py" "OUT/主题-完成版.pptx" --output "O
 python "SKILL_DIR/scripts/render_slides.py" "OUT/主题-完成版.pptx" --output-dir "OUT/work/render-final"
 ```
 
-`check_deck.py` 检查可打开、ZIP 完整、页数、顶层越界对象、显式小字号（默认低于 12 pt，可用 `--min-pt` 调整）及可编辑文字/表/图表数量。越界背景可能合理，10 pt 的页脚出处和图注属于设计；这些都是**需要视觉判断的线索**，不自动报为设计失败。继承字体、文本溢出、组合坐标、原图小字、实际可读性和论证质量仍须看图。
+`check_deck.py` 检查可打开、ZIP 完整、页数、顶层越界对象、显式小字号（默认低于 12 pt，可用 `--min-pt` 调整）及可编辑文字/表/图表数量，并提示**覆盖图片的文字标注候选**。后者是几何预警；需对照实际渲染判断是否遮住了原图的模块、文字、箭头、坐标或数据。越界背景可能合理，10 pt 的页脚出处和图注属于设计；这些都是**需要视觉判断的线索**，不自动报为设计失败。继承字体、文本溢出、组合坐标、原图小字、实际可读性和论证质量仍须看图。
 
 视觉验收每页至少回答：核心信息在哪里，证据能否读懂，有无重叠/溢出，数据与条件是否对应，修改是否已复查。先看联系表再看大图，密集图要局部放大。单页截图无法证明整套正常。
 
