@@ -4,6 +4,15 @@
 
 ## 制作
 
+制作规格 JSON 后、运行构建脚本前，建议执行语言预警工具：
+
+```text
+python "SKILL_DIR/scripts/lint_deck_language.py" "OUT/work/deck.json"
+```
+
+它只检查部分易出现“审稿腔”的词和过长句，结果不阻断 PPT 制作；出现警告时回到 [chinese-paper-explanation.md](chinese-paper-explanation.md) 人工改写。没有警告也不能说明幻灯片语言自然、机制讲得清楚。
+
+
 **新建论文讲解**默认用构建脚本（依赖 `python-pptx`、Pillow；PDF 首页渲染需要 PyMuPDF）：
 
 ```text
