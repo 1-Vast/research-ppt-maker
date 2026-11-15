@@ -20,7 +20,7 @@ description: Research and build editable, presentation-ready research PPTs from 
 
 ## 2. 检索并读懂论文
 
-先读 [references/paper-research-and-explanation.md](references/paper-research-and-explanation.md)：核对身份与版本，读原文、补充材料和理解所需的直接前作，定位要用的图表与数字。用当前可用的搜索/浏览工具或官方公开接口，不假设必有某个工具。
+先读 [references/paper-research-and-explanation.md](references/paper-research-and-explanation.md) 与 **[references/chinese-paper-explanation.md](references/chinese-paper-explanation.md)**：核对身份与版本，读原文、补充材料和理解所需的直接前作，定位要用的图表与数字。用当前可用的搜索/浏览工具或官方公开接口，不假设必有某个工具。
 
 - 在 `work/` 写简短内容计划：每页回答的问题、核心主张、图中对应位置及来源；背景记录“具体困难—后果—本文设计”，实验记录“待检验主张—检验方式—观察—结论范围”。它是内部资料，不额外交付。
 - 区分原文结论、作者论证、讲解者推断和待验证设想，必要时在页面上用短标签注明。
@@ -29,7 +29,7 @@ description: Research and build editable, presentation-ready research PPTs from 
 
 ## 3. 单篇论文 = 4–5 页
 
-**用户的常规论文交流默认每篇 4–5 页，含标题页。** 不加目录、分节、术语、致谢或“谢谢”页。用户要求讲得更细、深度精读或指定页数时按其要求；项目汇报和进展组会不套这一结构（见第 7 节）。
+**普通单篇论文可用 4–5 页（含标题页），但这是起点而非限制。复杂模型优先按理解障碍拆成总览、关键机制、训练目标、推理与证据页；用户要求精讲或提供较长篇幅时不机械压缩。** 不加目录、分节、术语、致谢或“谢谢”页。用户要求讲得更细、深度精读或指定页数时按其要求；项目汇报和进展组会不套这一结构（见第 7 节）。
 
 | 页 | 内部规划问题（不必写上页面） | 必含内容 | `layout` |
 |---|---|---|---|
@@ -48,6 +48,8 @@ description: Research and build editable, presentation-ready research PPTs from 
 **图解与证据。** 方法讲解沿同一模型图展开，输入、训练和下游读出与图中位置对应；复杂时用总览加局部放大，再分析核心创新，避免图文分离或重复的纯文字流程。实验按待检验主张选取，说明如何用划分、干预或对照检验它，再解释读数与结论范围；不以图号和提升数字代替论证。具体写法见 [research-story-and-visuals.md](references/research-story-and-visuals.md#方法与实现)。
 
 **简洁但不空洞。** 每个文字块有字数上限（见 [references/deck-spec.md](references/deck-spec.md)）。构建脚本报告溢出时先删减重复和次要内容，不靠缩小字号硬塞，也不把必要解释压成几个名词或口号。
+
+**屏幕语言必须经过“去审稿腔”复写。** 内部可以用“作用路径、待检验主张、评价协议、证据边界”组织研究，但幻灯片不要把这些审查栏目和抽象名词直接投给听众。每页改用具体对象、动作、条件和结果。按 [chinese-paper-explanation.md](references/chinese-paper-explanation.md) 的反例—正例逐句修订，画出能够追踪的具体例子；讲解准确性与原文核查同时满足。
 
 **页面文字要直接讲清科研内容。** 面向有专业基础但未读过本文的同行，写出具体对象、操作及其作用，例如“通过什么监督，增强哪种表示中的什么信息”。避免用“把能力写进目标”“知识留在表示中”“形成闭环”等抽象概括代替实际解释；保留准确的专业术语，并在首次出现或相邻方法页说明其所指。核心想法应能独立说明本文做了什么、为什么这样做，训练与下游使用的区别另用短句说明；不能依赖讲稿或口头补充才能理解。写法与实例见 [research-story-and-visuals.md](references/research-story-and-visuals.md#标题页)。
 
@@ -78,6 +80,8 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 ## 5. 渲染，检查，修正
 
+制作前额外执行一次**内容验收**：把每页中“待检验主张、作用路径、读出接口”等内部用语换成明确的操作句；检查封面一句话是否解释了具体任务与技术改变，方法页是否有真正的运算/监督细节。可用 `scripts/lint_deck_language.py` 对规格 JSON 做非阻断预警；该工具不代替人工判断，预警也不自动意味着科学事实错误。
+
 保存后必须重新打开成品，渲染**每一页**并核对页数（命令见 [references/build-and-verify.md](references/build-and-verify.md)）。先看整套缩略总览检查节奏与一致性，再看每页大图；不能用 OCR、对象检查或“脚本跑通”代替视觉检查。逐页检查：
 
 1. 栏目页眉、标题和图证是否一致；不看讲稿能否说出这一页的要点。核心想法与关键解释能否直接找到“什么对象、做了什么、作用是什么”；若只能读到抽象口号，改成具体科研表述。
@@ -107,6 +111,7 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 ## 可复用资源
 
+- [chinese-paper-explanation.md](references/chinese-paper-explanation.md)：**面向听众的中文科研表达规范、翻译腔修订、机制解释与回归案例（必读）**。
 - [deck-spec.md](references/deck-spec.md)：构建脚本的规格格式、字段字数上限与扩展方式。
 - [visual-design.md](references/visual-design.md)：配色、字体、网格、组件与可读性尺度。
 - [paper-research-and-explanation.md](references/paper-research-and-explanation.md)：从 DOI/标题/项目检索，到原文理解、机制与证据判别和科研绘图。
