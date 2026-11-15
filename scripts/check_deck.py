@@ -27,7 +27,24 @@ def inspect(deck: Path, min_pt: float = 12) -> dict:
     slides = []
     for number, slide in enumerate(presentation.slides, 1):
         editable = dict(text=0, tables=0, charts=0)
-        small, outside = [], []
+        small, outside, picture_text_overlaps = [], [], []
+        # Candidate labels placed directly over source figures. This is a geometry
+        # warning only; the renderer and reviewer must judge image content.
+        pictures = [x for x in slide.shapes if x.shape_type == 13]
+        for picture in pictures:
+            for label in slide.shapes:
+                if label.shape_id == picture.shape_id or not label.has_text_frame or not label.text.strip():
+                    continue
+                if label.width <= 0 or label.height <= 0:
+                    continue
+                ix = max(0, min(picture.left + picture.width, label.left + label.width)
+                         - max(picture.left, label.left))
+                iy = max(0, min(picture.top + picture.height, label.top + label.height)
+                         - max(picture.top, label.top))
+                if ix * iy / (label.width * label.height) >= 0.35:
+                    picture_text_overlaps.append(dict(
+                        picture_id=picture.shape_id, text_id=label.shape_id,
+                        text=label.text.strip()[:60]))
         # Group children have local coordinates: only test top-level geometry.
         for shape in slide.shapes:
             if (shape.left < 0 or shape.top < 0 or
@@ -50,10 +67,12 @@ def inspect(deck: Path, min_pt: float = 12) -> dict:
                         if size and size.pt < min_pt and run.text.strip():
                             small.append(dict(shape_id=shape.shape_id, points=round(size.pt, 1), text=run.text[:90]))
         slides.append(dict(slide=number, editable_objects=editable,
-                           out_of_bounds_candidates=outside, small_font_candidates=small))
+                           overlap_groups_not_inspected=sum(x.shape_type == 6 for x in slide.shapes),
+                           out_of_bounds_candidates=outside, small_font_candidates=small,
+                           picture_text_overlap_candidates=picture_text_overlaps))
     return dict(deck=str(deck), slide_count=len(slides), zip_integrity='ok',
                 visual_review_required=True,
-                limitations='Flags are review clues, not design failures. Inherited fonts, image text, overflow, overlap and scientific correctness require visual inspection.',
+                limitations='Flags are review clues, not design failures. Overlap checks use top-level, axis-aligned bounding boxes and flag intersections covering at least 35% of a text box. They do not inspect image content, rotation, transparency or stacking order; decorative images can cause false positives, and small intersections or grouped objects can escape detection. Inherited fonts, image text, overflow and scientific correctness require visual inspection.',
                 slides=slides)
 
 

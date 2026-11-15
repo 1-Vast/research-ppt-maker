@@ -1,6 +1,6 @@
 # 构建脚本规格：`scripts/build_deck.py`
 
-规格是一个 UTF-8 JSON 文件，放在 `OUT/work/deck.json`。相对路径（首页、图片、输出）都相对规格文件所在目录解析。
+规格是一个 UTF-8 JSON 文件，放在 `OUT/work/deck.json`。**只适用于当前五种通用版式；如果不能充分展示领域发展、完整模型结构或可读实验图，应该扩展或改用自定义布局，而不是强行塞满三个固定栏位。** 字段字数是排版建议；压缩导致难懂时应拆页。页面文案先按 [chinese-paper-explanation.md](chinese-paper-explanation.md) 完成人工复写。相对路径（首页、图片、输出）都相对规格文件所在目录解析。
 
 ```text
 python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"            # 输出到规格里的 output
@@ -77,7 +77,7 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json" -o "OUT/主题-完
 | `items[]` | 2–3 条 | `name` ≤ 9；`before` ≤ 40（已有方法，回指背景页前作）；`after` ≤ 40（本文改进）；`why` ≤ 30（主要作用，必要时带一个关键数字，区分设计意图和实验证实） |
 | `summary` | 50 | 一句话核心转变；可选 |
 
-### `evidence` 证据（可选）
+### `evidence` 证据（可合并，实证结论仍需展示对应证据）
 
 左侧放一种主证据，右侧放结论：
 
