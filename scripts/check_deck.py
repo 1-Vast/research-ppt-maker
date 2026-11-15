@@ -67,11 +67,12 @@ def inspect(deck: Path, min_pt: float = 12) -> dict:
                         if size and size.pt < min_pt and run.text.strip():
                             small.append(dict(shape_id=shape.shape_id, points=round(size.pt, 1), text=run.text[:90]))
         slides.append(dict(slide=number, editable_objects=editable,
+                           overlap_groups_not_inspected=sum(x.shape_type == 6 for x in slide.shapes),
                            out_of_bounds_candidates=outside, small_font_candidates=small,
                            picture_text_overlap_candidates=picture_text_overlaps))
     return dict(deck=str(deck), slide_count=len(slides), zip_integrity='ok',
                 visual_review_required=True,
-                limitations='Flags are review clues, not design failures. Picture/text overlaps require visual inspection; overlays outside the figure and grouped objects may escape detection. Inherited fonts, image text, overflow, overlap and scientific correctness require visual inspection.',
+                limitations='Flags are review clues, not design failures. Overlap checks use top-level, axis-aligned bounding boxes and flag intersections covering at least 35% of a text box. They do not inspect image content, rotation, transparency or stacking order; decorative images can cause false positives, and small intersections or grouped objects can escape detection. Inherited fonts, image text, overflow and scientific correctness require visual inspection.',
                 slides=slides)
 
 

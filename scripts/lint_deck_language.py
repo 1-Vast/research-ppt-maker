@@ -26,15 +26,20 @@ GENERIC_TITLES = {"研究背景", "方法介绍", "方法创新", "实验结果"
 FIELDS = {
     "title", "idea", "lede", "text", "note", "name", "did", "limit", "approach",
     "question", "before", "after", "why", "summary", "points", "boundary", "caption",
+    "example", "example_label", "label", "prior_label", "columns", "rows", "categories",
 }
 META_FIELDS = {"source", "cite", "original_title", "authors", "affiliation", "first_page",
-               "first_page_caption", "eyebrow", "path", "output", "label"}
+               "first_page_caption", "eyebrow", "path", "output"}
+CONTAINERS = {"context", "prior", "gap", "lanes", "steps", "formula", "items",
+              "figure", "table", "chart"}
 
 
 def fields(value, path=""):
     if isinstance(value, dict):
         for key, child in value.items():
-            if key in META_FIELDS or key in {"table", "chart", "figure"}:
+            if key in META_FIELDS:
+                continue
+            if key not in FIELDS and key not in CONTAINERS:
                 continue
             child_path = f"{path}.{key}" if path else key
             if isinstance(child, str):
@@ -53,7 +58,9 @@ def inspect(spec):
     results = []
     for i, slide in enumerate(spec.get("slides", []), 1):
         for path, value in fields(slide):
-            s = re.sub(r"\*\*|~\{[^}]+\}", "", value)
+            # Small grey text and subscripts/superscripts remain visible in the
+            # builder. Remove their markup, not the words inside it.
+            s = re.sub(r"[~_^]\{([^}]+)\}", r"\1", value.replace("**", ""))
             for term, hint in REVIEW_TERMS.items():
                 if term in s:
                     results.append((i, path, f"审稿/抽象词“{term}”：{hint}"))

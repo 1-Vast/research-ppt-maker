@@ -34,6 +34,30 @@ class LanguageChecks(unittest.TestCase):
                             "lede": "模型在每个位置比较不同蛋白，再沿图像位置交换特征。"}]}
         self.assertFalse(lint_language(spec))
 
+    def test_visible_builder_fields_are_checked(self):
+        spec = {"slides": [{
+            "context": {"example": "观察与结论：模型可迁移"},
+            "figure": {"path": "待检验主张.png", "caption": "作用路径"},
+            "table": {"columns": ["怎样检验"], "rows": [["读出接口"]]},
+            "chart": {"categories": ["跨尺度赋能"], "values": [1]},
+            "lanes": [{"label": "待检验主张", "steps": []}],
+            "source": "待检验主张 et al.",
+        }]}
+        paths = {path for _, path, _ in lint_language(spec)}
+        self.assertEqual(paths, {"context.example", "figure.caption", "table.columns[0]",
+                                 "table.rows[0][0]", "chart.categories[0]", "lanes[0].label"})
+
+    def test_styled_text_remains_visible_to_checker(self):
+        spec = {"slides": [{"points": ["~{待检验主张}：测试 **读出接口**"]}]}
+        issues = lint_language(spec)
+        self.assertEqual(len(issues), 2)
+
+    def test_evidence_image_path_is_not_copy(self):
+        spec = {"slides": [{"figure": "待检验主张.png", "source": "作用路径",
+                            "internal_plan": ["待检验主张"],
+                            "chart": {"highlight": "读出接口"}}]}
+        self.assertFalse(lint_language(spec))
+
 
 class FigureOverlapChecks(unittest.TestCase):
     def _create_deck(self, filepath, overlap=True):
@@ -62,6 +86,19 @@ class FigureOverlapChecks(unittest.TestCase):
             self._create_deck(path, overlap=False)
             report = check_deck(path)
             self.assertEqual(report["slides"][0]["picture_text_overlap_candidates"], [])
+
+    def test_group_coverage_limit_is_reported(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "grouped.pptx"
+            self._create_deck(path)
+            deck = Presentation(path)
+            slide = deck.slides[0]
+            slide.shapes.add_group_shape(list(slide.shapes))
+            deck.save(path)
+            report = check_deck(path)
+            self.assertEqual(report["slides"][0]["overlap_groups_not_inspected"], 1)
+            self.assertEqual(report["slides"][0]["picture_text_overlap_candidates"], [])
+            self.assertEqual(report["slides"][0]["editable_objects"]["text"], 1)
 
 
 if __name__ == "__main__":
