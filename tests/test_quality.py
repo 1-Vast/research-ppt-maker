@@ -16,11 +16,16 @@ from pptx import Presentation
 from pptx.util import Inches
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from lint_deck_language import inspect as lint_language
+from lint_deck_language import inspect as lint_language, inspect_pptx
 from check_deck import inspect as check_deck
 
 
 class LanguageChecks(unittest.TestCase):
+    def test_academic_cues_allow_case_spacing_and_punctuation_variants(self):
+        text = "看 ×；Mask查询；每位置 s（p）"
+        issues = lint_language({"slides": [{"title": text}]})
+        self.assertEqual(len(issues), 3)
+
     def test_reviewer_jargon_is_flagged(self):
         spec = {"slides": [{"layout": "evidence", "title": "跨队列泛化",
                             "points": ["待检验主张：模型能否迁移？", "观察与结论：r=0.67"]}]}
@@ -33,6 +38,18 @@ class LanguageChecks(unittest.TestCase):
                             "title": "同一空间位置的不同蛋白先交换信息",
                             "lede": "模型在每个位置比较不同蛋白，再沿图像位置交换特征。"}]}
         self.assertFalse(lint_language(spec))
+
+    def test_final_pptx_language_is_checked(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'final.pptx'
+            prs = Presentation()
+            slide = prs.slides.add_slide(prs.slide_layouts[6])
+            t = slide.shapes.add_textbox(Inches(1), Inches(1), Inches(7), Inches(1))
+            t.text = '整通道隐藏时看这条路，另丢弃 0–25% 通道。'
+            prs.save(path)
+            issues = inspect_pptx(path)
+            self.assertTrue(any('看这条路' in msg for _, _, msg in issues))
+            self.assertTrue(any('另丢弃' in msg for _, _, msg in issues))
 
     def test_visible_builder_fields_are_checked(self):
         spec = {"slides": [{

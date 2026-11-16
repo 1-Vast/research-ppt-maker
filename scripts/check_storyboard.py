@@ -18,6 +18,8 @@ budget or original-overview checks. density_reason (top-level or per paper)
 records an exception to default density advice; overview_reason explains a
 necessary redraw-first fallback without removing overview/source checks.
 Warnings are for human decisions, never mechanical failure or proof of quality.
+Top-level scope="paper-only" (default) disallows project_slides. Project scopes
+expect a recorded user request and a source for each project slide.
 Usage: python scripts/check_storyboard.py work/storyboard.json [--strict]
 """
 from __future__ import annotations
@@ -41,9 +43,34 @@ def audit(data: dict) -> list[dict]:
     warnings: list[dict] = []
     if not isinstance(data, dict):
         return [{"code": "invalid_storyboard", "detail": "Expected a JSON object."}]
+    scope = data.get("scope", "paper-only")
+    valid_scope = scope in ("paper-only", "paper-plus-project", "project-only")
+    if not valid_scope:
+        warnings.append({"code": "invalid_scope", "detail": "Use paper-only, paper-plus-project or project-only."})
     papers = data.get("papers", [])
-    if not isinstance(papers, list) or not papers:
-        return [{"code": "missing_papers", "detail": "Expected a nonempty papers list."}]
+    if not isinstance(papers, list) or (not papers and scope != "project-only"):
+        warnings.append({"code": "missing_papers", "detail": "Expected a nonempty papers list unless scope is project-only."})
+        papers = []
+    project_slides = data.get("project_slides", [])
+    if not isinstance(project_slides, list):
+        warnings.append({"code": "invalid_project_slides", "detail": "project_slides must be a list."})
+        project_slides = []
+    if project_slides and (scope == "paper-only" or not valid_scope):
+        warnings.append({"code": "unrequested_project_slides",
+                         "detail": "Default paper-only scope forbids project experiment pages; explicit user authorization is required."})
+    if scope in ("paper-plus-project", "project-only"):
+        if not project_slides:
+            warnings.append({"code": "missing_project_slides", "detail": "Project scope requires sourced project_slides."})
+        if data.get("project_authorized") is not True:
+            warnings.append({"code": "missing_project_authorization",
+                             "detail": "Mark project_authorized=true only after verifying explicit user request; the checker cannot verify permission itself."})
+        if scope == "project-only" and papers:
+            warnings.append({"code": "unexpected_papers_in_project_only", "detail": "Use paper-plus-project when papers and project work are both requested."})
+        for i, slide in enumerate(project_slides, 1):
+            source = slide.get("source") if isinstance(slide, dict) else None
+            if not isinstance(source, str) or not source.strip():
+                warnings.append({"code": "untraceable_project_evidence", "slide": i,
+                                 "detail": "Every project progress page must identify a user-provided experiment/source; do not invent results."})
     mode = data.get("mode", "journal-club")
     if mode not in ("journal-club", "deep-reading"):
         warnings.append({"code": "invalid_mode", "detail": "Use journal-club or deep-reading."})
@@ -74,6 +101,13 @@ def audit(data: dict) -> list[dict]:
         for i, slide in enumerate(slides, 1):
             if not isinstance(slide, dict) or not isinstance(slide.get("purpose"), str) or not slide["purpose"].strip():
                 warnings.append({"paper": name, "slide": i, "code": "invalid_slide", "detail": "Each slide needs an object with a purpose."})
+                continue
+            if slide["purpose"].strip().lower() in ("project-progress", "project-experiment", "project-results"):
+                warnings.append({"paper": name, "slide": i, "code": "project_slide_under_paper",
+                                 "detail": "Place user-requested project pages in project_slides so project scope and sources are checked."})
+                if scope == "paper-only" or not valid_scope:
+                    warnings.append({"paper": name, "slide": i, "code": "unrequested_project_slides",
+                                     "detail": "Verify that the user requested project content."})
                 continue
             valid_slides.append((i, slide))
         valid_papers.append(paper)

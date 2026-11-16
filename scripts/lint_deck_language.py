@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Heuristic copy-edit review for research PPT JSON specs.
+"""Heuristic copy-edit review for research PPT JSON specs and PPTX files.
 
 Warnings are prompts for human review, not proof of bad Chinese or bad science.
-Usage: python scripts/lint_deck_language.py path/to/deck.json [--strict]
+Usage: python scripts/lint_deck_language.py path/to/deck.json|deck.pptx [--strict]
 """
 from __future__ import annotations
 
@@ -21,8 +21,19 @@ REVIEW_TERMS = {
     "知识写入表示": "指出具体训练目标如何约束哪些变量",
     "怎样检验": "改写为具体的对照、划分和指标，或删除重复栏目名",
     "观察与结论": "直接写观测数字及其可支持的解释",
+    "测谁": "写明蛋白身份或测量对象；不要用口语提示代替专业名称",
+    "另丢弃": "写明额外随机移除/遮挡哪些通道以及条件",
+    "看这条路": "直接描述具体信息传递路径",
+    "看“×”": "说明图例 × 对应的评估条件",
+    "mask 查询": "明确目标蛋白的 Mask Token、身份条件与解码器输入；核对原文",
+    "每位置 s(p)": "首次给出每个空间位置的汇总表示及 p 的含义",
 }
 GENERIC_TITLES = {"研究背景", "方法介绍", "方法创新", "实验结果", "核心贡献", "模型框架"}
+TERM_VARIANTS = {
+    "看“×”": re.compile(r"""看\s*["'“‘]?\s*×"""),
+    "mask 查询": re.compile(r"\bmask\s*查询", re.IGNORECASE),
+    "每位置 s(p)": re.compile(r"每位置\s*s\s*[（(]\s*p\s*[）)]", re.IGNORECASE),
+}
 FIELDS = {
     "title", "idea", "lede", "text", "note", "name", "did", "limit", "approach",
     "question", "before", "after", "why", "summary", "points", "boundary", "caption",
@@ -62,7 +73,7 @@ def inspect(spec):
             # builder. Remove their markup, not the words inside it.
             s = re.sub(r"[~_^]\{([^}]+)\}", r"\1", value.replace("**", ""))
             for term, hint in REVIEW_TERMS.items():
-                if term in s:
+                if matches_term(term, s):
                     results.append((i, path, f"审稿/抽象词“{term}”：{hint}"))
             if path == "title" and s.strip() in GENERIC_TITLES:
                 results.append((i, path, "标题缺少本页的具体科研判断"))
@@ -73,13 +84,57 @@ def inspect(spec):
     return results
 
 
+def matches_term(term, text):
+    variant = TERM_VARIANTS.get(term)
+    return bool(variant.search(text)) if variant else term in text
+
+
+
+def pptx_fields(slide):
+    """Read editable slide text, including groups and tables, without OCR."""
+    def walk(shapes, prefix=""):
+        for shape in shapes:
+            here = f"{prefix}shape-{shape.shape_id}"
+            if shape.shape_type == 6:
+                yield from walk(shape.shapes, here + "/")
+            elif shape.has_text_frame and shape.text.strip():
+                yield here, shape.text.strip()
+            if shape.has_table:
+                for ri, row in enumerate(shape.table.rows):
+                    for ci, cell in enumerate(row.cells):
+                        if not cell.is_spanned and cell.text.strip():
+                            yield f"{here}/table[{ri},{ci}]", cell.text.strip()
+    yield from walk(slide.shapes)
+
+
+def inspect_pptx(path):
+    """Apply the same wording heuristics to the delivered presentation.
+
+    Cannot inspect text baked into screenshots, SmartArt or chart labels.
+    """
+    from pptx import Presentation
+    results = []
+    for slide_no, slide in enumerate(Presentation(path).slides, 1):
+        for field, value in pptx_fields(slide):
+            cleaned = re.sub(r"[~_^]\{([^}]+)\}", r"\1", value.replace("**", ""))
+            for term, hint in REVIEW_TERMS.items():
+                if matches_term(term, cleaned):
+                    results.append((slide_no, field, f"表达候选“{term}”：{hint}"))
+            if len(cleaned) > 135 and ("通过" in cleaned and "从而" in cleaned):
+                results.append((slide_no, field, "长句可能包含多重因果连接，需人工检查"))
+    return results
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("spec", type=Path)
+    parser.add_argument("spec", type=Path, help="JSON authoring spec or final PPTX")
     parser.add_argument("--strict", action="store_true", help="exit 1 if there are warnings")
     args = parser.parse_args()
-    spec = json.loads(args.spec.read_text(encoding="utf-8"))
-    issues = inspect(spec)
+    if args.spec.suffix.lower() == ".pptx":
+        issues = inspect_pptx(args.spec)
+    else:
+        spec = json.loads(args.spec.read_text(encoding="utf-8"))
+        issues = inspect(spec)
     for slide, path, why in issues:
         print(f"slide {slide} {path}: {why}")
     print(f"Language review: {len(issues)} potential issue(s); human review is mandatory.")
