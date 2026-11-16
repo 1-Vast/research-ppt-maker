@@ -74,6 +74,24 @@ def check_slides(prs):
     return issues
 
 
+
+def check_project_scope(prs, scope="paper-only"):
+    """Candidate only: detect project-progress headers in paper-only decks."""
+    if scope != "paper-only":
+        return []
+    issues = []
+    for i, slide in enumerate(prs.slides, 1):
+        titles = slide_texts(slide)[:3]
+        if any("项目进展" in t or "项目实验" in t for t in titles):
+            issues.append({
+                "slide": i,
+                "code": "possible_unrequested_project_progress",
+                "severity": "review",
+                "detail": "Project content appears in a paper-only deck. Verify explicit user authorization; do not infer it from prior presentations."
+            })
+    return issues
+
+
 def picture_signature(slide):
     return [(hashlib.sha256(shape.image.blob).hexdigest(),
              int(shape.left), int(shape.top), int(shape.width), int(shape.height),
@@ -137,12 +155,13 @@ def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("deck", type=Path)
     p.add_argument("--baseline", type=Path)
+    p.add_argument("--scope", choices=("paper-only", "paper-plus-project", "project-only"), default="paper-only")
     p.add_argument("--output", type=Path)
     args = p.parse_args(argv)
     new = Presentation(args.deck)
     report = {"deck": str(args.deck), "slide_count": len(new.slides),
               "limitations": "Candidates use editable text, including group text and table cells; image text, charts and SmartArt are not read. Missing editable labels may still exist inside images. No candidate is an automatic failure or proof of scientific accuracy.",
-              "content_review_candidates": check_slides(new)}
+              "content_review_candidates": check_slides(new) + check_project_scope(new, args.scope)}
     if args.baseline:
         report["revision_comparison"] = compare_decks(args.baseline, args.deck)
     output = json.dumps(report, ensure_ascii=False, indent=2)
