@@ -12,6 +12,33 @@ from check_storyboard import audit
 
 
 class StoryboardTests(unittest.TestCase):
+    def test_default_paper_only_rejects_project_slides(self):
+        data = {'papers': [{'name': 'Paper', 'paper_type': 'review', 'role': 'supporting', 'budget': 1,
+                            'slides': [{'purpose': 'context'}]}],
+                'project_slides': [{'purpose': 'progress', 'source': 'user experiment'}]}
+        self.assertIn('unrequested_project_slides', {w['code'] for w in audit(data)})
+
+    def test_authorized_paper_plus_project(self):
+        data = {'scope': 'paper-plus-project', 'project_authorized': True,
+                'papers': [{'name': 'Paper', 'paper_type': 'review', 'role': 'supporting',
+                            'budget': 1, 'slides': [{'purpose': 'context'}]}],
+                'project_slides': [{'purpose': 'progress', 'source': 'user/experiments/run1.csv'}]}
+        self.assertEqual(audit(data), [])
+
+    def test_project_mode_without_explicit_authorization_or_source_warns(self):
+        data = {'scope': 'paper-plus-project',
+                'papers': [{'name': 'Paper', 'paper_type': 'review', 'role': 'supporting',
+                            'budget': 1, 'slides': [{'purpose': 'context'}]}],
+                'project_slides': [{'purpose': 'progress'}]}
+        codes = {w['code'] for w in audit(data)}
+        self.assertIn('missing_project_authorization', codes)
+        self.assertIn('untraceable_project_evidence', codes)
+
+    def test_project_only_mode(self):
+        data = {'scope': 'project-only', 'project_authorized': True, 'papers': [],
+                'project_slides': [{'source': 'user/experiment.json', 'purpose': 'progress'}]}
+        self.assertEqual(audit(data), [])
+
     def test_original_overview_and_reasonable_density(self):
         data = {"papers": [{"name": "Paper A", "paper_type": "original-method",
                  "role": "primary", "available_original_overview": True,
