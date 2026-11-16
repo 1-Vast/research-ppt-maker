@@ -18,7 +18,7 @@ budget or original-overview checks. density_reason (top-level or per paper)
 records an exception to default density advice; overview_reason explains a
 necessary redraw-first fallback without removing overview/source checks.
 Warnings are for human decisions, never mechanical failure or proof of quality.
-Top-level scope="paper-only" (default) disallows project_slides; paper-plus-project\nrequires explicit user authorization and source for each project slide.\nUsage: python scripts/check_storyboard.py work/storyboard.json [--strict]
+Top-level scope="paper-only" (default) disallows project_slides; paper-plus-project or project-only\nrequires explicit user authorization and source for each project slide.\nUsage: python scripts/check_storyboard.py work/storyboard.json [--strict]
 """
 from __future__ import annotations
 
@@ -41,23 +41,27 @@ def audit(data: dict) -> list[dict]:
     warnings: list[dict] = []
     if not isinstance(data, dict):
         return [{"code": "invalid_storyboard", "detail": "Expected a JSON object."}]
-    papers = data.get("papers", [])
-    if not isinstance(papers, list) or not papers:
-        return [{"code": "missing_papers", "detail": "Expected a nonempty papers list."}]
     scope = data.get("scope", "paper-only")
-    if scope not in ("paper-only", "paper-plus-project"):
-        warnings.append({"code": "invalid_scope", "detail": "Use paper-only or paper-plus-project."})
+    if scope not in ("paper-only", "paper-plus-project", "project-only"):
+        warnings.append({"code": "invalid_scope", "detail": "Use paper-only, paper-plus-project or project-only."})
+    papers = data.get("papers", [])
+    if not isinstance(papers, list) or (not papers and scope != "project-only"):
+        return [{"code": "missing_papers", "detail": "Expected a nonempty papers list unless scope is project-only."}]
     project_slides = data.get("project_slides", [])
     if not isinstance(project_slides, list):
         warnings.append({"code": "invalid_project_slides", "detail": "project_slides must be a list."})
         project_slides = []
-    if project_slides and scope != "paper-plus-project":
+    if project_slides and scope == "paper-only":
         warnings.append({"code": "unrequested_project_slides",
                          "detail": "Default paper-only scope forbids project experiment pages; explicit user authorization is required."})
-    if scope == "paper-plus-project":
+    if scope in ("paper-plus-project", "project-only"):
+        if not project_slides:
+            warnings.append({"code": "missing_project_slides", "detail": "Project scope requires sourced project_slides."})
         if data.get("project_authorized") is not True:
             warnings.append({"code": "missing_project_authorization",
                              "detail": "Mark project_authorized=true only after verifying explicit user request; the checker cannot verify permission itself."})
+        if scope == "project-only" and papers:
+            warnings.append({"code": "unexpected_papers_in_project_only", "detail": "Use paper-plus-project when papers and project work are both requested."})
         for i, slide in enumerate(project_slides, 1):
             if not isinstance(slide, dict) or not str(slide.get("source", "")).strip():
                 warnings.append({"code": "untraceable_project_evidence", "slide": i,
