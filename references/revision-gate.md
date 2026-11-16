@@ -14,7 +14,7 @@
 
 ## 二、先出内部「故事板」，再运行 PPT 构建
 
-组会精讲和多论文合并时，按 [journal-club-density-and-figures.md](journal-club-density-and-figures.md) 额外记录每篇论文的 `paper_role`、`slide_budget`、`overview_first`（原文总模型图来源/位置）、`selected_experiments`（决定性 1–2 项）和删除项。
+组会精讲和多论文合并时，按 [journal-club-density-and-figures.md](journal-club-density-and-figures.md) 额外记录每篇论文的 `role`、`budget`、`overview_first`（原文总模型图来源/位置）、`selected_experiments`（决定性 1–2 项）和删除项。
 
 
 在 `work/storyboard.json` 或等价文件，**按每篇论文**记录：
@@ -24,7 +24,7 @@
 - `one_sentence_takeaway`: 不依赖模型缩写的核心想法；
 - `core_contributions`: 每项贡献的对象、具体改变或论点、原文位置和对应证据；缺少组件实验时标明设计意图，不用总体性能替代；
 - `method_map`: 模型论文记录输入、核心计算、训练/推断与输出；实验、综述、理论等按论文类型改为实验设计、概念组织或论证关系，不硬填模型字段；
-- `slide_plan`: **为什么必须有这一页、听众在此处新增理解了什么、选哪张图、图讲的是否恰好是该页结论**；重复解释页或低优先级实验页应合并删除；
+- `slides`（等价文字计划也可；运行检查器时按组会规范字段组织）: **为什么必须有这一页、听众在此处新增理解了什么、选哪张图、图讲的是否恰好是该页结论**；重复解释页或低优先级实验页应合并删除；
 - `visual_evidence`: 精确到 figure 和 panel 的出处；有定量结论则对应结果图或真实数值表；
 - `omissions`: 删除与辅助化的内容及其理由；复杂创新不允许只给三个标签不解释。
 - `revision_map`（改稿时）：每项反馈对应旧页/对象、缺失理解、所需原文或图表、新页/对象与验收办法。完成后补实际检查结果；重排时记录新旧页对应，不能按相同页码强行比较。
