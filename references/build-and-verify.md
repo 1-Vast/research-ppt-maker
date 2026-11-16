@@ -53,6 +53,16 @@ python "SKILL_DIR/scripts/vision_review.py" --inventory "OUT/work/visual_invento
 
 ## 成品检查
 
+**重做讲解前后对照**（只有用户提供旧稿时才加 `--baseline`）：
+
+```text
+python "SKILL_DIR/scripts/review_deck.py" "OUT/主题-完成版.pptx" --output "OUT/work/semantic-candidates.json"
+python "SKILL_DIR/scripts/review_deck.py" "OUT/主题-完成版.pptx" --baseline "INPUT/旧稿.pptx" --output "OUT/work/revision-review.json"
+```
+
+检查器提示重复解释、失效标注和架构/指标并存候选；读取可编辑文字（含组合与表格），不读取图片文字、图表或 SmartArt。版本比较按页索引及图片顺序配对，统计图片字节、位置、裁剪与旋转；不自动对齐重排页面，组合对象需人工检查。图片变化统计不能判断讲解质量：重构任务逐项核对原始反馈、修复内容、图证与实际渲染，合适的旧图允许保留。详见 [revision-gate.md](revision-gate.md)。
+
+
 ```text
 python "SKILL_DIR/scripts/check_deck.py" "OUT/主题-完成版.pptx" --output "OUT/work/structure-check.json"
 python "SKILL_DIR/scripts/render_slides.py" "OUT/主题-完成版.pptx" --output-dir "OUT/work/render-final"
