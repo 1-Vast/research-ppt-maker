@@ -106,7 +106,7 @@ def inspect_pptx(path):
     results = []
     for slide_no, slide in enumerate(Presentation(path).slides, 1):
         for field, value in pptx_fields(slide):
-            cleaned = re.sub(r"[~_^]\\{([^}]+)\\}", r"\\1", value.replace("**", ""))
+            cleaned = re.sub(r"[~_^]\{([^}]+)\}", r"\1", value.replace("**", ""))
             for term, hint in REVIEW_TERMS.items():
                 if term.lower() in cleaned.lower():
                     results.append((slide_no, field, f"表达候选“{term}”：{hint}"))
