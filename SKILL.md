@@ -20,8 +20,9 @@ description: Research and build editable, presentation-ready research PPTs from 
 
 ## 2. 检索并读懂论文
 
-先读 **[references/teaching-first-workflow.md](references/teaching-first-workflow.md)**（含背景叙事、主次机制、图证与论文类型分流）、[references/paper-research-and-explanation.md](references/paper-research-and-explanation.md) 与 [references/chinese-paper-explanation.md](references/chinese-paper-explanation.md)：核对身份与版本，读原文、补充材料和理解所需的直接前作，定位要用的图表与数字。用当前可用的搜索/浏览工具或官方公开接口，不假设必有某个工具。
+先读 **[references/revision-gate.md](references/revision-gate.md)**（用户要求重做讲解时先判别改动级别，避免只换词）、**[references/teaching-first-workflow.md](references/teaching-first-workflow.md)**（含背景叙事、主次机制、图证与论文类型分流）、[references/paper-research-and-explanation.md](references/paper-research-and-explanation.md) 与 [references/chinese-paper-explanation.md](references/chinese-paper-explanation.md)：核对身份与版本，读原文、补充材料和理解所需的直接前作，定位要用的图表与数字。用当前可用的搜索/浏览工具或官方公开接口，不假设必有某个工具。
 
+- **对于新建或要求重构讲解的 PPT，先生成内部 `work/storyboard.json`（或等价故事板），核对每页的学习目标、核心机制、选择的原图面板与其证据关系；若只有旧页的同义改写，不进入排版。** 仅修个别错字或版式时无需重做故事板。
 - 在 `work/` 先按论文类型梳理背景、贡献与证据；方法论文另做模型解剖表，再写逐页内容计划：观众当前知道什么、需要理解什么、图像证据在哪里、什么是主要创新与辅助模块。**背景不能只是三条技术困难与对应模块；原始方法论文与综述采用不同讲解剧本**（详见 teaching-first-workflow）。审稿用的“待检验主张—对照—指标—边界”只进入内部笔记，不固定显示为 PPT 栏目。
 - 区分原文结论、作者论证、讲解者推断和待验证设想，必要时在页面上用短标签注明。
 - 不编造结果、引用、误差线、显著性、机制箭头或图片含义。生成式插图只能解释概念，不能充当实验数据。
@@ -84,6 +85,8 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 制作前检查论文类型、背景与前作、核心贡献主次、机制和图证对应，再检查页面语言。可用 `scripts/lint_deck_language.py` 对规格 JSON 做非阻断预警；它只提示部分表达问题，不判断科学事实，也不代替人工审核。
 
+保存后先运行 `scripts/review_deck.py` 检查重复解释、失效标注及架构图与指标混用候选；如有旧稿且本轮任务是重构讲解，使用 `--baseline` 检查是否只是换词。此工具只能给出预警，不能自动证明教学效果。详见 [revision-gate.md](references/revision-gate.md)。
+
 保存后必须重新打开成品，渲染**每一页**并核对页数（命令见 [references/build-and-verify.md](references/build-and-verify.md)）。先看整套缩略总览检查节奏与一致性，再看每页大图；不能用 OCR、对象检查或“脚本跑通”代替视觉检查。逐页检查：
 
 1. 栏目页眉、标题和图证是否一致；不看讲稿能否说出这一页的要点。核心想法与关键解释能否直接找到“什么对象、做了什么、作用是什么”；若只能读到抽象口号，改成具体科研表述。
@@ -113,6 +116,7 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 ## 可复用资源
 
+- [revision-gate.md](references/revision-gate.md)：**改动级别、故事板、同页重复文案、失效标注、图证错配及新旧版本回归检查（重构任务必读）**。
 - [teaching-first-workflow.md](references/teaching-first-workflow.md)：**领域发展脉络、模型核心主次、原图无遮挡、实验如何读、原始研究与综述分流（必读）**。
 - [chinese-paper-explanation.md](references/chinese-paper-explanation.md)：**面向听众的中文科研表达规范、翻译腔修订、机制解释与回归案例（必读）**。
 - [deck-spec.md](references/deck-spec.md)：构建脚本的规格格式、字段字数上限与扩展方式。
