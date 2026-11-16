@@ -22,7 +22,9 @@ description: Research and build editable, presentation-ready research PPTs from 
 
 对于组会、两篇及以上论文或用户要求精简的制作任务，先读 **[references/journal-club-density-and-figures.md](references/journal-club-density-and-figures.md)**（页数预算、原图总览先行、实验 1–2 项、取消制作痕迹）；然后读 **[references/revision-gate.md](references/revision-gate.md)**，按反馈限定改动范围并建立逐项验收记录。论文理解按 **[references/teaching-first-workflow.md](references/teaching-first-workflow.md)**（背景、主次机制、图证与论文类型分流）、[references/paper-research-and-explanation.md](references/paper-research-and-explanation.md) 与 [references/chinese-paper-explanation.md](references/chinese-paper-explanation.md) 执行：核对身份与版本，读原文、补充材料和必要的直接前作，定位图表与数字。用当前可用的搜索/浏览工具或官方公开接口，不假设必有某个工具。
 
+- **任务范围默认 paper-only**：只有用户在当前任务或明确有效上下文要求汇报自己的工作，才允许加入独立的项目实验页；其他时候仅处理论文，即使旧稿中曾有项目页也不得自动复制。用户明确要求时按 [references/project-progress-mode.md](references/project-progress-mode.md) 区分论文证据与自己的真实实验，不能补造数据或未来计划。
 - **新建或重构讲解前，先写简短内部故事板（可复用内容计划，无需重复建文件）**，明确各页新增理解、核心内容与来源图证；改稿逐项记录反馈、内容修复和验收办法，再进入排版。保留合适的图文，不以换图或增页数量判断是否完成；仅修个别错字或版式时无需重做故事板。
+- 论文页数预算**不包括用户明确授权的项目进展页**。混合汇报应分别计划论文和项目的篇幅，不能用两篇论文默认 9–11 页的参考预算删除已获授权的项目实验。
 - 制作前先给每篇论文标注重点程度与页数预算，内部故事板使用 `papers[].role/budget/slides` 记录主次、预算和逐页计划，并记录原文主图、关键机制、实验取舍与删减理由（字段见组会规范）。双篇重点方法+辅助综述且无用户明确页数时建议合计 9–11 页；不为了硬限额牺牲关键证据与可读性。
 - 在 `work/` 先按论文类型梳理背景、贡献与证据；方法论文另做模型解剖表，再写逐页内容计划：观众当前知道什么、需要理解什么、图像证据在哪里、什么是主要创新与辅助模块。**背景不能只是三条技术困难与对应模块；原始方法论文与综述采用不同讲解剧本**（详见 teaching-first-workflow）。审稿用的“待检验主张—对照—指标—边界”只进入内部笔记，不固定显示为 PPT 栏目。
 - 区分原文结论、作者论证、讲解者推断和待验证设想，必要时在页面上用短标签注明。
@@ -65,6 +67,8 @@ description: Research and build editable, presentation-ready research PPTs from 
 
 **简洁但不空洞。** 文字块按版式参考建议字数（见 [references/deck-spec.md](references/deck-spec.md)）。构建脚本报告溢出时先删减重复和次要内容，不靠缩小字号硬塞，也不把必要解释压成几个名词或口号。
 
+**正式而自然的科研语言**：先进行语体审查（“测谁、另丢弃、看这条路”等）、术语与符号首次定义审查（Mask Token、s(p) 等），再检查信息流与监督路径是否忠于原文（Decoder 可访问哪些 Token、完全遮挡时有什么信息通路）。用户已认可布局时不得因文字审查擅自重做版式。详见 [references/academic-language-and-mechanism.md](references/academic-language-and-mechanism.md)。
+
 **页面语言面向听众。** 内部审核栏目不直接充当页面结构；按 [chinese-paper-explanation.md](references/chinese-paper-explanation.md) 检查对象、操作、条件和结果是否具体。准确的专业术语可以保留，首次出现就近解释，不为去除某个词而损失科学含义。
 
 **自然的学术分析。** 用具体科研表述解释本文做了什么、为什么这样做，避免抽象名词堆叠和口号。封面概括任务、核心改变和主要用途，细节留给方法页。同一对象全套同名，术语首次出现解释其具体含义；改写须保留实验条件、版本与证据强度。栏目按内容选取，不机械复制“待检验主张—怎样检验—观察与结论”等内部审查模板。
@@ -94,7 +98,7 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 ## 5. 渲染，检查，修正
 
-制作前检查论文类型、背景与前作、核心贡献主次、机制和图证对应，再检查页面语言。可用 `scripts/lint_deck_language.py` 对规格 JSON 做非阻断预警；它只提示部分表达问题，不判断科学事实，也不代替人工审核。
+制作前检查论文类型、背景与前作、核心贡献主次、机制和图证对应，再检查页面语言。用 `scripts/lint_deck_language.py` 检查规格 JSON；**无论是否采用预设 JSON 布局，最终导出的 .pptx 也必须运行同一脚本，防止自定义绘图页绕过语言审查**。它只提示部分表达问题，不判断科学事实，也不代替人工审核。
 
 讲解重构完成后可运行 `scripts/review_deck.py` 提示重复解释、失效标注及架构图与指标混用候选；有旧稿时可加 `--baseline` 提取变化线索。按反馈与成品对应记录逐项验收，图片哈希、相同页码或变化比例不能判定是否只是换词。工具不替代原文与渲染检查，详见 [revision-gate.md](references/revision-gate.md)。
 
@@ -121,12 +125,15 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 按 [references/research-story-and-visuals.md](references/research-story-and-visuals.md) 组织，视觉沿用第 4 节：
 
 - **多篇论文**：先给每篇明确 primary / supporting / equal 权重与全套页数预算。重点模型论文应优先原始总图、机制和 1–2 项核心实验；辅助综述减少案例页。用户不指定时双篇重点方法＋辅助综述建议 9–11 页，而非机械叠加每篇 4–5 页。每组以标题页开始，页序按组。
+- **论文＋项目实验混合组会（仅用户明确要求）**：先完成文献背景和机制，另设用户工作模块，使用实际记录和明确的数据划分报告关键对照、负结果与研究决策。未经明确要求不得自动插入项目结果页、项目方案或下一步。项目页另计预算。详见 [references/project-progress-mode.md](references/project-progress-mode.md)。
 - **进展组会**：围绕本次要求组织。经验复盘讲“尝试与假设 → 实际观察 → 排除了什么/仍未证明什么 → 已获得的教训”；用户只要经验时，不自行补后续计划。仅在用户要求方案或下一步时展开对应内容。
 - **方案/调研**：任务定义 → 同维度比较 → 可验证缺口 → 方案与验证路线。项目事实来自用户材料，背景可检索；区分已实现、拟增加和待验证。
 - **美化已有 PPT**：先提取并渲染原件，保留内容与可编辑对象，按第 4 节统一配色、字体与层级，不改动结论。
 
 ## 可复用资源
 
+- [project-progress-mode.md](references/project-progress-mode.md)：**默认只有论文；仅用户明确授权时添加独立的真实项目实验进展，禁止编造、混淆数据和自动加未来计划**。
+- [academic-language-and-mechanism.md](references/academic-language-and-mechanism.md)：**自然正式学术表达、符号首次定义、Summary Token 与遮挡信息流核查**。
 - [journal-club-density-and-figures.md](references/journal-club-density-and-figures.md)：**组会默认页数预算、论文原图先行、核心创新的深度权重、精选实验和去除制作痕迹（必读）**。
 - [revision-gate.md](references/revision-gate.md)：**改动级别、故事板、同页重复文案、失效标注、图证错配及新旧版本回归检查（重构任务必读）**。
 - [teaching-first-workflow.md](references/teaching-first-workflow.md)：**领域发展脉络、模型核心主次、原图无遮挡、实验如何读、原始研究与综述分流（必读）**。
