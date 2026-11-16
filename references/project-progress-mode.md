@@ -22,6 +22,21 @@
 
 ## 3. 页数规划：论文预算与项目预算分开
 
+可用故事板示例（仅示意字段）：
+
+```json
+{
+  "mode": "journal-club",
+  "scope": "paper-plus-project",
+  "project_authorized": true,
+  "papers": [{"name":"Paper A", "paper_type":"original-method", "role":"primary", "budget":2, "available_original_overview":false, "slides":[{"purpose":"context"},{"purpose":"method-overview", "source":"Methods", "visual":"redraw"}]}],
+  "project_slides": [{"purpose":"progress", "source":"用户提供的实验日志或结果文件"}]
+}
+```
+
+只有确实收到用户授权才能写 `project_authorized:true`；该字段并非自动授权，也不允许通过历史样例推断用户本次想要项目进展。
+
+
 在 `work/storyboard.json` 顶层显式声明 `scope: "paper-only"`（默认）、`scope: "paper-plus-project"` 或 `scope: "project-only"`。原有的 `mode: "journal-club" / "deep-reading"` 是**讲解深度设置**，与是否包含项目页的 scope 相互独立，不能混用。设置项目范围还要记录 `project_authorized: true`，这个值只能在确认用户明确要求后写入，机器无法自行核实授权。论文页按论文类型和主次分配，项目页使用单独的 `project_slides`，记录来源和角色。不能把项目页计入“重点方法论文＋辅助综述”的 9–11 页参考预算中，也不能因自动超过该预算而删除用户明确要汇报的实验。
 
 默认没有项目授权时，`project_slides` 必须为空或不存在；若用户仅要求项目进展，可用 `scope: "project-only"`、`papers: []` 和有真实来源的 `project_slides`；不能因为上传 PPT 中曾有项目实验页，就自动复制到新稿。授权后项目页数取决于用户已有的真实进展、汇报时间与研究重点，通常精简为 2–4 页但不是硬上限。
