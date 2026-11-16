@@ -18,7 +18,7 @@ budget or original-overview checks. density_reason (top-level or per paper)
 records an exception to default density advice; overview_reason explains a
 necessary redraw-first fallback without removing overview/source checks.
 Warnings are for human decisions, never mechanical failure or proof of quality.
-Usage: python scripts/check_storyboard.py work/storyboard.json [--strict]
+Top-level scope="paper-only" (default) disallows project_slides; paper-plus-project\nrequires explicit user authorization and source for each project slide.\nUsage: python scripts/check_storyboard.py work/storyboard.json [--strict]
 """
 from __future__ import annotations
 
@@ -44,6 +44,24 @@ def audit(data: dict) -> list[dict]:
     papers = data.get("papers", [])
     if not isinstance(papers, list) or not papers:
         return [{"code": "missing_papers", "detail": "Expected a nonempty papers list."}]
+    scope = data.get("scope", "paper-only")
+    if scope not in ("paper-only", "paper-plus-project"):
+        warnings.append({"code": "invalid_scope", "detail": "Use paper-only or paper-plus-project."})
+    project_slides = data.get("project_slides", [])
+    if not isinstance(project_slides, list):
+        warnings.append({"code": "invalid_project_slides", "detail": "project_slides must be a list."})
+        project_slides = []
+    if project_slides and scope != "paper-plus-project":
+        warnings.append({"code": "unrequested_project_slides",
+                         "detail": "Default paper-only scope forbids project experiment pages; explicit user authorization is required."})
+    if scope == "paper-plus-project":
+        if data.get("project_authorized") is not True:
+            warnings.append({"code": "missing_project_authorization",
+                             "detail": "Mark project_authorized=true only after verifying explicit user request; the checker cannot verify permission itself."})
+        for i, slide in enumerate(project_slides, 1):
+            if not isinstance(slide, dict) or not str(slide.get("source", "")).strip():
+                warnings.append({"code": "untraceable_project_evidence", "slide": i,
+                                 "detail": "Every project progress page must identify a user-provided experiment/source; do not invent results."})
     mode = data.get("mode", "journal-club")
     if mode not in ("journal-club", "deep-reading"):
         warnings.append({"code": "invalid_mode", "detail": "Use journal-club or deep-reading."})
