@@ -21,6 +21,11 @@ from check_deck import inspect as check_deck
 
 
 class LanguageChecks(unittest.TestCase):
+    def test_academic_cues_allow_case_spacing_and_punctuation_variants(self):
+        text = "看 ×；Mask查询；每位置 s（p）"
+        issues = lint_language({"slides": [{"title": text}]})
+        self.assertEqual(len(issues), 3)
+
     def test_reviewer_jargon_is_flagged(self):
         spec = {"slides": [{"layout": "evidence", "title": "跨队列泛化",
                             "points": ["待检验主张：模型能否迁移？", "观察与结论：r=0.67"]}]}

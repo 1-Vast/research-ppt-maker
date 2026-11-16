@@ -40,6 +40,11 @@ class RevisionReviewTests(unittest.TestCase):
     def test_project_content_is_reviewed_only_in_paper_scope(self):
         prs = Presentation()
         slide = prs.slides.add_slide(prs.slide_layouts[6])
+        paragraph = slide.shapes.add_textbox(Inches(1), Inches(3), Inches(5), Inches(1))
+        paragraph.text = "项目实验显示了一种观察结果，见所引论文。"
+        self.assertEqual(check_project_scope(prs), [])
+        for _ in range(3):
+            slide.shapes.add_textbox(Inches(1), Inches(3), Inches(5), Inches(1)).text = "引文"
         label = slide.shapes.add_textbox(Inches(1), Inches(1), Inches(5), Inches(1))
         label.text = "项目进展 / 实验结果"
         self.assertIn("possible_unrequested_project_progress",

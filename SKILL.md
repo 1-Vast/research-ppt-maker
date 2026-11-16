@@ -22,9 +22,9 @@ description: Research and build editable, presentation-ready research PPTs from 
 
 对于组会、两篇及以上论文或用户要求精简的制作任务，先读 **[references/journal-club-density-and-figures.md](references/journal-club-density-and-figures.md)**（页数预算、原图总览先行、实验 1–2 项、取消制作痕迹）；然后读 **[references/revision-gate.md](references/revision-gate.md)**，按反馈限定改动范围并建立逐项验收记录。论文理解按 **[references/teaching-first-workflow.md](references/teaching-first-workflow.md)**（背景、主次机制、图证与论文类型分流）、[references/paper-research-and-explanation.md](references/paper-research-and-explanation.md) 与 [references/chinese-paper-explanation.md](references/chinese-paper-explanation.md) 执行：核对身份与版本，读原文、补充材料和必要的直接前作，定位图表与数字。用当前可用的搜索/浏览工具或官方公开接口，不假设必有某个工具。
 
-- **任务范围默认 paper-only**：只有用户在当前任务或明确有效上下文要求汇报自己的工作，才允许加入独立的项目实验页；其他时候仅处理论文，即使旧稿中曾有项目页也不得自动复制。用户明确要求时按 [references/project-progress-mode.md](references/project-progress-mode.md) 区分论文证据与自己的真实实验，不能补造数据或未来计划。
+- **按请求界定论文和项目的范围**：新建论文汇报默认 `paper-only`；明确要求加入自己的工作时使用 `paper-plus-project`，仅汇报自己的工作时使用 `project-only`。仅把旧稿当模板时，不移入其中的项目内容。原稿是修改对象且用户要求保留其余内容时，保留原有项目页；是否改写项目页由本次请求决定。详见 [references/project-progress-mode.md](references/project-progress-mode.md)。
 - **新建或重构讲解前，先写简短内部故事板（可复用内容计划，无需重复建文件）**，明确各页新增理解、核心内容与来源图证；改稿逐项记录反馈、内容修复和验收办法，再进入排版。保留合适的图文，不以换图或增页数量判断是否完成；仅修个别错字或版式时无需重做故事板。
-- 论文页数预算**不包括用户明确授权的项目进展页**。混合汇报应分别计划论文和项目的篇幅，不能用两篇论文默认 9–11 页的参考预算删除已获授权的项目实验。
+- 混合汇报分别给论文与项目分配篇幅。双篇论文的 9–11 页建议仅计算论文部分；用户明确规定整套时长或页数时，在总预算内分配两部分。
 - 制作前先给每篇论文标注重点程度与页数预算，内部故事板使用 `papers[].role/budget/slides` 记录主次、预算和逐页计划，并记录原文主图、关键机制、实验取舍与删减理由（字段见组会规范）。双篇重点方法+辅助综述且无用户明确页数时建议合计 9–11 页；不为了硬限额牺牲关键证据与可读性。
 - 在 `work/` 先按论文类型梳理背景、贡献与证据；方法论文另做模型解剖表，再写逐页内容计划：观众当前知道什么、需要理解什么、图像证据在哪里、什么是主要创新与辅助模块。**背景不能只是三条技术困难与对应模块；原始方法论文与综述采用不同讲解剧本**（详见 teaching-first-workflow）。审稿用的“待检验主张—对照—指标—边界”只进入内部笔记，不固定显示为 PPT 栏目。
 - 区分原文结论、作者论证、讲解者推断和待验证设想，必要时在页面上用短标签注明。
@@ -98,9 +98,9 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 ## 5. 渲染，检查，修正
 
-制作前检查论文类型、背景与前作、核心贡献主次、机制和图证对应，再检查页面语言。用 `scripts/lint_deck_language.py` 检查规格 JSON；**无论是否采用预设 JSON 布局，最终导出的 .pptx 也必须运行同一脚本，防止自定义绘图页绕过语言审查**。它只提示部分表达问题，不判断科学事实，也不代替人工审核。
+制作前检查论文类型、背景与前作、核心贡献主次、机制和图证对应，再检查页面语言。使用规格 JSON 时运行 `scripts/lint_deck_language.py`。导出最终 `.pptx` 后再运行同一脚本，包括自定义版式；逐页查看渲染，人工核对语体、首次术语定义及机制条件，包括检查器读不到的图中文字。
 
-讲解重构完成后运行 `scripts/review_deck.py` 提示重复解释、失效标注及架构图与指标混用候选，并默认检查误插入的项目进展页。只有本次明确授权时才用 `--scope paper-plus-project` 或 `--scope project-only`。有旧稿时可加 `--baseline` 提取变化线索。按反馈与成品对应记录逐项验收，图片哈希、相同页码或变化比例不能判定是否只是换词。工具不替代原文与渲染检查，详见 [revision-gate.md](references/revision-gate.md)。
+讲解重构完成后运行 `scripts/review_deck.py` 提示重复解释、失效标注及架构图与指标混用候选，并按实际交付范围使用默认 `paper-only`、`--scope paper-plus-project` 或 `--scope project-only`。有旧稿时可加 `--baseline` 提取变化线索。按反馈与成品对应记录逐项验收，图片哈希、相同页码或变化比例不能判定是否只是换词。工具不替代原文与渲染检查，详见 [revision-gate.md](references/revision-gate.md)。
 
 保存后必须重新打开成品，渲染**每一页**并核对页数（命令见 [references/build-and-verify.md](references/build-and-verify.md)）。先看整套缩略总览检查节奏与一致性，再看每页大图；不能用 OCR、对象检查或“脚本跑通”代替视觉检查。逐页检查：
 
@@ -110,6 +110,7 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 4. 方法论文至少一条“设计差异 → 具体作用 → 对应证据”能从成品重建；其他类型检查核心结论与其证据或论证是否对应。未验证的设计意图不得写成已证实机制。
 5. **结果图/表和解释是否在讲同一项实验**；不能以架构图旁列结果数字代替证据。数据、单位、指标方向、基线和引用与原文一致；首页截图来自真实论文，出处清楚。
 6. 成品可打开、页数完整、文字和表格可编辑；用模板时与原模板对照。
+7. 密集原图须有可见的阅读起点及关键区域指引；架构与结果同页时，分别说明各图回答什么问题，保留各自出处和对应解释。用户认可版式时优先调整图注、措辞及图文指向，并复查受影响页。
 
 修复后重新渲染受影响页面，内容顺序改变时重查整套。关键问题清零才称为完成；渲染或视觉工具不可用时，保留成品并明确“视觉验收未完成”，不得宣称已逐页验证。
 

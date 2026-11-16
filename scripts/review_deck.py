@@ -81,13 +81,17 @@ def check_project_scope(prs, scope="paper-only"):
         return []
     issues = []
     for i, slide in enumerate(prs.slides, 1):
-        titles = slide_texts(slide)[:3]
-        if any("项目进展" in t or "项目实验" in t for t in titles):
+        title = slide.shapes.title
+        titles = [title.text.strip()] if title is not None else []
+        titles.extend(shape.text.strip() for shape in slide.shapes
+                      if shape.has_text_frame and shape.top < prs.slide_height / 4)
+        if any(len(t) <= 32 and "\n" not in t and t.startswith(("项目进展", "项目实验", "项目研究进展"))
+               for t in titles):
             issues.append({
                 "slide": i,
                 "code": "possible_unrequested_project_progress",
                 "severity": "review",
-                "detail": "Project content appears in a paper-only deck. Verify explicit user authorization; do not infer it from prior presentations."
+                "detail": "Wording may refer to the user's project progress. Check whether it describes cited work or actual project content, and verify the user's request if it is project content."
             })
     return issues
 
@@ -159,7 +163,7 @@ def main(argv=None):
     p.add_argument("--output", type=Path)
     args = p.parse_args(argv)
     new = Presentation(args.deck)
-    report = {"deck": str(args.deck), "slide_count": len(new.slides),
+    report = {"deck": str(args.deck), "slide_count": len(new.slides), "scope": args.scope,
               "limitations": "Candidates use editable text, including group text and table cells; image text, charts and SmartArt are not read. Missing editable labels may still exist inside images. No candidate is an automatic failure or proof of scientific accuracy.",
               "content_review_candidates": check_slides(new) + check_project_scope(new, args.scope)}
     if args.baseline:

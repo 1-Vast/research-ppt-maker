@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Heuristic copy-edit review for research PPT JSON specs.
+"""Heuristic copy-edit review for research PPT JSON specs and PPTX files.
 
 Warnings are prompts for human review, not proof of bad Chinese or bad science.
 Usage: python scripts/lint_deck_language.py path/to/deck.json|deck.pptx [--strict]
@@ -29,6 +29,11 @@ REVIEW_TERMS = {
     "每位置 s(p)": "首次给出每个空间位置的汇总表示及 p 的含义",
 }
 GENERIC_TITLES = {"研究背景", "方法介绍", "方法创新", "实验结果", "核心贡献", "模型框架"}
+TERM_VARIANTS = {
+    "看“×”": re.compile(r"""看\s*["'“‘]?\s*×"""),
+    "mask 查询": re.compile(r"\bmask\s*查询", re.IGNORECASE),
+    "每位置 s(p)": re.compile(r"每位置\s*s\s*[（(]\s*p\s*[）)]", re.IGNORECASE),
+}
 FIELDS = {
     "title", "idea", "lede", "text", "note", "name", "did", "limit", "approach",
     "question", "before", "after", "why", "summary", "points", "boundary", "caption",
@@ -68,7 +73,7 @@ def inspect(spec):
             # builder. Remove their markup, not the words inside it.
             s = re.sub(r"[~_^]\{([^}]+)\}", r"\1", value.replace("**", ""))
             for term, hint in REVIEW_TERMS.items():
-                if term in s:
+                if matches_term(term, s):
                     results.append((i, path, f"审稿/抽象词“{term}”：{hint}"))
             if path == "title" and s.strip() in GENERIC_TITLES:
                 results.append((i, path, "标题缺少本页的具体科研判断"))
@@ -77,6 +82,11 @@ def inspect(spec):
             if re.search(r"(?:通过.{0,30}){2,}从而", s):
                 results.append((i, path, "因果链过长：拆句并写出中间操作和输出"))
     return results
+
+
+def matches_term(term, text):
+    variant = TERM_VARIANTS.get(term)
+    return bool(variant.search(text)) if variant else term in text
 
 
 
@@ -108,7 +118,7 @@ def inspect_pptx(path):
         for field, value in pptx_fields(slide):
             cleaned = re.sub(r"[~_^]\{([^}]+)\}", r"\1", value.replace("**", ""))
             for term, hint in REVIEW_TERMS.items():
-                if term.lower() in cleaned.lower():
+                if matches_term(term, cleaned):
                     results.append((slide_no, field, f"表达候选“{term}”：{hint}"))
             if len(cleaned) > 135 and ("通过" in cleaned and "从而" in cleaned):
                 results.append((slide_no, field, "长句可能包含多重因果连接，需人工检查"))

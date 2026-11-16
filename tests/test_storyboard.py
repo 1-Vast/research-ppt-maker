@@ -12,6 +12,23 @@ from check_storyboard import audit
 
 
 class StoryboardTests(unittest.TestCase):
+    def test_project_purpose_nested_under_paper_still_warns(self):
+        data = {'papers': [{'paper_type': 'review', 'role': 'supporting', 'budget': 1,
+                            'slides': [{'purpose': 'project-experiment'}]}]}
+        self.assertEqual({w['code'] for w in audit(data)},
+                         {'project_slide_under_paper', 'unrequested_project_slides'})
+
+    def test_missing_papers_does_not_hide_scope_warnings(self):
+        data = {'scope': 'mixed', 'project_slides': [{'source': 'log.csv'}]}
+        self.assertEqual({w['code'] for w in audit(data)},
+                         {'invalid_scope', 'missing_papers', 'unrequested_project_slides'})
+
+    def test_null_or_structured_source_is_not_a_traceable_reference(self):
+        data = {'scope': 'project-only', 'project_authorized': True,
+                'project_slides': [{'source': None}, {'source': {}}, {'source': 'log.csv'}]}
+        self.assertEqual([(w['code'], w['slide']) for w in audit(data)],
+                         [('untraceable_project_evidence', 1), ('untraceable_project_evidence', 2)])
+
     def test_default_paper_only_rejects_project_slides(self):
         data = {'papers': [{'name': 'Paper', 'paper_type': 'review', 'role': 'supporting', 'budget': 1,
                             'slides': [{'purpose': 'context'}]}],

@@ -4,7 +4,7 @@
 
 ## 制作
 
-**论文与项目页范围检查**：默认模式为 `paper-only`，只有用户明确要求汇报当前工作才可以设为 `paper-plus-project`，并在单独项目区记录实际实验来源。项目进展页不属于多篇论文 9–11 页的默认参考预算；具体按 [project-progress-mode.md](project-progress-mode.md)。
+**论文与项目页范围检查**：默认模式为 `paper-only`，用户要求结合当前工作，或要求保留已有混合稿的项目区时，使用 `paper-plus-project`，并在单独项目区记录实际实验来源。项目进展页不属于多篇论文 9–11 页的默认参考预算；具体按 [project-progress-mode.md](project-progress-mode.md)。
 
 **多论文组会先做页数与模型图顺序审查**：按 [journal-club-density-and-figures.md](journal-club-density-and-figures.md) 写 `work/storyboard.json`（每篇 `papers[]` 记录角色、页数、总图的原始来源和核心实验），运行非阻断预警：
 
@@ -26,8 +26,6 @@ python "SKILL_DIR/scripts/check_storyboard.py" "OUT/work/storyboard.json"
 
 ```text
 python "SKILL_DIR/scripts/lint_deck_language.py" "OUT/work/deck.json"
-# 包含自定义绘制页面时仍需检查最终可编辑文字
-python "SKILL_DIR/scripts/lint_deck_language.py" "OUT/主题-完成版.pptx"
 ```
 
 它只检查部分易出现“审稿腔”、口语化提示和过长句，结果不阻断 PPT 制作；对 PPTX 读取可编辑文字及组合/表格文字，不读取图片内文字和 SmartArt，必须再结合逐页渲染审查；制作前还必须人工审核 [teaching-first-workflow.md](teaching-first-workflow.md) 的领域脉络、总模型图、图证对应和综述类型。出现警告时回到 [chinese-paper-explanation.md](chinese-paper-explanation.md) 人工改写。没有警告也不能说明幻灯片语言自然、机制讲得清楚。
@@ -73,14 +71,20 @@ python "SKILL_DIR/scripts/vision_review.py" --inventory "OUT/work/visual_invento
 
 ## 成品检查
 
-**重做讲解前后对照**（只有用户提供旧稿时才加 `--baseline`）：
+导出 PPTX 后，可用以下命令检查可编辑文字。没有所需运行环境时，按 [academic-language-and-mechanism.md](academic-language-and-mechanism.md) 逐页人工审查。
+
+```text
+python "SKILL_DIR/scripts/lint_deck_language.py" "OUT/主题-完成版.pptx"
+```
+
+**重做讲解前后对照**（只有用户提供旧稿时才加 `--baseline`，有无基线均按实际范围设置 `--scope`）：
 
 ```text
 python "SKILL_DIR/scripts/review_deck.py" "OUT/主题-完成版.pptx" --scope paper-only --output "OUT/work/semantic-candidates.json"
-python "SKILL_DIR/scripts/review_deck.py" "OUT/主题-完成版.pptx" --baseline "INPUT/旧稿.pptx" --output "OUT/work/revision-review.json"
+python "SKILL_DIR/scripts/review_deck.py" "OUT/主题-完成版.pptx" --scope paper-only --baseline "INPUT/旧稿.pptx" --output "OUT/work/revision-review.json"
 ```
 
-检查器提示重复解释、失效标注和架构/指标并存候选；默认 `--scope paper-only` 还提示可能误插入的项目进展页。只有用户明确要求混合汇报时才使用 `--scope paper-plus-project`，独立项目汇报使用 `--scope project-only`；CLI 选择不能替代核实用户授权。读取可编辑文字（含组合与表格），不读取图片文字、图表或 SmartArt。版本比较按页索引及图片顺序配对，统计图片字节、位置、裁剪与旋转；不自动对齐重排页面，组合对象需人工检查。图片变化统计不能判断讲解质量：重构任务逐项核对原始反馈、修复内容、图证与实际渲染，合适的旧图允许保留。详见 [revision-gate.md](revision-gate.md)。
+检查器提示重复解释、失效标注和架构/指标并存候选；默认 `--scope paper-only` 还提示可能误插入的项目进展页。实际任务范围包含论文与项目时使用 `--scope paper-plus-project`，独立项目汇报使用 `--scope project-only`；CLI 选择不能替代核实用户授权。读取可编辑文字（含组合与表格），不读取图片文字、图表或 SmartArt。版本比较按页索引及图片顺序配对，统计图片字节、位置、裁剪与旋转；不自动对齐重排页面，组合对象需人工检查。图片变化统计不能判断讲解质量：重构任务逐项核对原始反馈、修复内容、图证与实际渲染，合适的旧图允许保留。详见 [revision-gate.md](revision-gate.md)。
 
 
 ```text
