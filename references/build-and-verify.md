@@ -4,6 +4,8 @@
 
 ## 制作
 
+**论文与项目页范围检查**：默认模式为 `paper-only`，只有用户明确要求汇报当前工作才可以设为 `paper-plus-project`，并在单独项目区记录实际实验来源。项目进展页不属于多篇论文 9–11 页的默认参考预算；具体按 [project-progress-mode.md](project-progress-mode.md)。
+
 **多论文组会先做页数与模型图顺序审查**：按 [journal-club-density-and-figures.md](journal-club-density-and-figures.md) 写 `work/storyboard.json`（每篇 `papers[]` 记录角色、页数、总图的原始来源和核心实验），运行非阻断预警：
 
 ```text
@@ -24,9 +26,11 @@ python "SKILL_DIR/scripts/check_storyboard.py" "OUT/work/storyboard.json"
 
 ```text
 python "SKILL_DIR/scripts/lint_deck_language.py" "OUT/work/deck.json"
+# 包含自定义绘制页面时仍需检查最终可编辑文字
+python "SKILL_DIR/scripts/lint_deck_language.py" "OUT/主题-完成版.pptx"
 ```
 
-它只检查部分易出现“审稿腔”的词和过长句，结果不阻断 PPT 制作；制作前还必须人工审核 [teaching-first-workflow.md](teaching-first-workflow.md) 的领域脉络、总模型图、图证对应和综述类型。出现警告时回到 [chinese-paper-explanation.md](chinese-paper-explanation.md) 人工改写。没有警告也不能说明幻灯片语言自然、机制讲得清楚。
+它只检查部分易出现“审稿腔”、口语化提示和过长句，结果不阻断 PPT 制作；对 PPTX 读取可编辑文字及组合/表格文字，不读取图片内文字和 SmartArt，必须再结合逐页渲染审查；制作前还必须人工审核 [teaching-first-workflow.md](teaching-first-workflow.md) 的领域脉络、总模型图、图证对应和综述类型。出现警告时回到 [chinese-paper-explanation.md](chinese-paper-explanation.md) 人工改写。没有警告也不能说明幻灯片语言自然、机制讲得清楚。
 
 
 **新建论文讲解**先按内容选布局。五种通用布局足够时可用构建脚本（依赖 `python-pptx`、Pillow；PDF 首页渲染需要 PyMuPDF）；复杂总览、机制放大或综述可按 deck-spec 的扩展示例制作可编辑页面，验收要求相同：
