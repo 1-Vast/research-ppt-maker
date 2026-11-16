@@ -100,7 +100,7 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json"
 
 制作前检查论文类型、背景与前作、核心贡献主次、机制和图证对应，再检查页面语言。用 `scripts/lint_deck_language.py` 检查规格 JSON；**无论是否采用预设 JSON 布局，最终导出的 .pptx 也必须运行同一脚本，防止自定义绘图页绕过语言审查**。它只提示部分表达问题，不判断科学事实，也不代替人工审核。
 
-讲解重构完成后可运行 `scripts/review_deck.py` 提示重复解释、失效标注及架构图与指标混用候选；有旧稿时可加 `--baseline` 提取变化线索。按反馈与成品对应记录逐项验收，图片哈希、相同页码或变化比例不能判定是否只是换词。工具不替代原文与渲染检查，详见 [revision-gate.md](references/revision-gate.md)。
+讲解重构完成后运行 `scripts/review_deck.py` 提示重复解释、失效标注及架构图与指标混用候选，并默认检查误插入的项目进展页。只有本次明确授权时才用 `--scope paper-plus-project` 或 `--scope project-only`。有旧稿时可加 `--baseline` 提取变化线索。按反馈与成品对应记录逐项验收，图片哈希、相同页码或变化比例不能判定是否只是换词。工具不替代原文与渲染检查，详见 [revision-gate.md](references/revision-gate.md)。
 
 保存后必须重新打开成品，渲染**每一页**并核对页数（命令见 [references/build-and-verify.md](references/build-and-verify.md)）。先看整套缩略总览检查节奏与一致性，再看每页大图；不能用 OCR、对象检查或“脚本跑通”代替视觉检查。逐页检查：
 
