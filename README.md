@@ -4,6 +4,8 @@
 
 ## 使用
 
+**多论文组会默认精简**：用户未指定页数时，重点方法论文约 6–7 页、辅助综述约 3–4 页（两篇合计约 9–11 页），优先使用论文作者的原始完整模型图作为总览，再用局部教学图讲关键创新，只选 1–2 项决定性实验。详见 `references/journal-club-density-and-figures.md`。这是建议范围，深度精读或指定页数可调整。
+
 将本仓库放入个人 skills 目录，文件夹名保持 `research-ppt-maker`。Windows 本机已安装路径为 `D:/CodexData/.codex/skills/research-ppt-maker`。
 
 在 Codex 新聊天中输入：
