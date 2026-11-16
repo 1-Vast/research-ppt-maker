@@ -1,5 +1,7 @@
 # 构建脚本规格：`scripts/build_deck.py`
 
+组会精讲先按 [journal-club-density-and-figures.md](journal-club-density-and-figures.md) 决定整套页数预算、每篇主次和原文总图的放置；五种布局不是固定的讲解顺序。论文原始模型图优先用独立的大图版式放在背景之后，后续再使用可编辑机制示意图。制作性注释放在内部来源记录，幻灯片只留正常学术出处。
+
 规格是一个 UTF-8 JSON 文件，放在 `OUT/work/deck.json`。**只适用于当前五种通用版式；如果不能充分展示领域发展、完整模型结构或可读实验图，应该扩展或改用自定义布局，而不是强行塞满三个固定栏位。** 字段字数是排版建议；压缩导致难懂时应拆页。页面文案先按 [chinese-paper-explanation.md](chinese-paper-explanation.md) 完成人工复写。相对路径（首页、图片、输出）都相对规格文件所在目录解析。
 
 ```text
@@ -17,7 +19,7 @@ python "SKILL_DIR/scripts/build_deck.py" "OUT/work/deck.json" -o "OUT/主题-完
 |---|---|
 | `lang` | `zh`（默认）或 `en`；决定页眉、栏目标签和换行规则；中文默认使用研究背景/方法框架/方法创新/实验结果等学术栏目 |
 | `output` | 输出 `.pptx` 路径 |
-| `compact_text` | 可选布尔值，默认 `false`。获准使用稍小字号时设为 `true`，标题与主要正文的起始字号下调 1.5 pt，保留各角色下限，正文最低 13 pt。 |
+| `compact_text` | 可选布尔值，默认 `false`。需要稍高信息密度时设为 `true`，默认构建脚本的标题与正文起始字号下调 1.5 pt，正文仍最低 13 pt。定制版式可在人工投影验收后对非关键说明单独使用 12–13 pt；不要因为想减少页数损害论文原图可读性。 |
 | `cite` | 页脚出处，如 `Lipman et al., ICLR 2023 · arXiv:2210.02747`；`cover` 里的 `cite` 会覆盖本组后续页 |
 | `slides` | 按顺序排列的页面；每个 `cover` 开启一组新论文，进度条按组重置。组内超过五个内容页或重复使用布局时，进度条显示本组页序 |
 
