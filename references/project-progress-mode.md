@@ -34,7 +34,7 @@
 }
 ```
 
-在 `work/storyboard.json` 顶层声明 `scope: "paper-only"`（默认）、`scope: "paper-plus-project"` 或 `scope: "project-only"`。`mode: "journal-club" / "deep-reading"` 仍只控制论文讲解深度。交付含项目页时，按第 1 节核实本次请求所允许的范围，再记录 `project_authorized: true`；该字段只记录判断结果。项目页独立列入 `project_slides`，记录来源和角色。双篇论文的 9–11 页建议仅计算论文部分；若用户指定整套页数或时长，在其限制内分别分配两部分。
+在 `work/storyboard.json` 顶层声明 `scope: "paper-only"`（默认）、`scope: "paper-plus-project"` 或 `scope: "project-only"`。`mode: "journal-club" / "deep-reading"` 仍只控制论文讲解深度。交付含项目页时，按第 1 节核实本次请求所允许的范围，再记录 `project_authorized: true`；该字段只记录判断结果。项目页独立列入 `project_slides`，记录来源和角色。重点方法与辅助综述的紧凑汇报中，9–11 页预算只计论文部分；若用户指定整套页数或时长，在其限制内分别分配两部分。
 
 默认没有项目授权时，`project_slides` 必须为空或不存在；若用户仅要求项目进展，可用 `scope: "project-only"`、`papers: []` 和有真实来源的 `project_slides`；不能因为上传 PPT 中曾有项目实验页，就自动复制到新稿。授权后项目页数取决于用户已有的真实进展、汇报时间与研究重点，通常精简为 2–4 页但不是硬上限。
 

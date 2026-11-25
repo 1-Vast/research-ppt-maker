@@ -4,7 +4,7 @@
 
 ## 制作
 
-**论文与项目页范围检查**：默认模式为 `paper-only`，用户要求结合当前工作，或要求保留已有混合稿的项目区时，使用 `paper-plus-project`，并在单独项目区记录实际实验来源。项目进展页不属于多篇论文 9–11 页的默认参考预算；具体按 [project-progress-mode.md](project-progress-mode.md)。
+**论文与项目页范围检查**：默认模式为 `paper-only`，用户要求结合当前工作，或要求保留已有混合稿的项目区时，使用 `paper-plus-project`，并在单独项目区记录实际实验来源。重点方法与辅助综述的紧凑汇报中，9–11 页预算只计论文部分；具体按 [project-progress-mode.md](project-progress-mode.md)。
 
 **多论文组会先做页数与模型图顺序审查**：按 [journal-club-density-and-figures.md](journal-club-density-and-figures.md) 写 `work/storyboard.json`（每篇 `papers[]` 记录角色、页数、总图的原始来源和核心实验），运行非阻断预警：
 
@@ -54,7 +54,7 @@ python "SKILL_DIR/scripts/render_slides.py" "input.pptx" --output-dir "OUT/work/
 
 新版渲染器：Windows 先用 PowerPoint 只读导出全部页；不可用时尝试 LibreOffice 导出 PDF 后逐页栅格化。输出按实际页序命名 `slide-001.png`，写 `render_manifest.json`，含源文件 SHA256、页数和后端。使用空输出目录，每轮修改用新子目录，避免旧图混入。
 
-验证 PNG 数量等于 `.pptx` 实际页数；单个缩略预览不能通过。Quick Look 只生成预览，不用于整套验收。隐藏页也属检查范围。LibreOffice 需要可调用的 `soffice` 或安装在常规路径，PDF 栅格化需要 PyMuPDF (`fitz`)。
+用确切的候选文件路径渲染。目录中有多个 PPT 时按文件名定位。验证 PNG 数量等于交付 PPTX 的实际页数，且 `render_manifest.json` 中的 SHA-256 匹配交付文件。若从候选复制成品，在最终路径再核对哈希。Quick Look 只生成预览，不用于整套验收。隐藏页也属检查范围。LibreOffice 需要可调用的 `soffice` 或安装在常规路径，PDF 栅格化需要 PyMuPDF (`fitz`)。
 
 宏文件、旧 `.ppt` 或无法处理的格式使用本地应用导出副本，不覆盖原件。不要把工具失败描述成已验收。
 
