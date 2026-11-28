@@ -8,7 +8,8 @@ CROSS_PAPER_PURPOSES = {
     "multi-paper-comparison", "multi-paper-synthesis",
 }
 CROSS_PAPER_LABEL = re.compile(
-    r"^(?:(?:双|两|多)(?:篇)?论文|跨论文|跨文献)\s*(?:[/:：·—-]\s*)?"
+    r"^(?:(?:双|两|多)(?:篇)?(?:论文|文献)|跨论文|跨文献)\s*"
+    r"(?:的\s*)?(?:[/:：·—-]\s*)?"
     r"(?:对照|对比|比较|综合|总结)|"
     r"^(?:cross[- ]paper|multi[- ]paper)\s+(?:comparison|synthesis|summary)",
     re.I,

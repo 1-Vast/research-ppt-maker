@@ -13,6 +13,7 @@ from pathlib import Path
 
 from PIL import Image
 from pptx import Presentation
+from pptx.enum.shapes import MSO_CONNECTOR
 from pptx.util import Inches
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
@@ -47,6 +48,30 @@ class RevisionReviewTests(unittest.TestCase):
         self.assertIn("possible_unrequested_cross_paper_comparison",
                       {w["code"] for w in check_cross_paper_scope(prs)})
         self.assertEqual(check_cross_paper_scope(prs, True), [])
+
+    def test_cross_paper_comparison_detects_grouped_header_variants(self):
+        prs = Presentation()
+        slide = prs.slides.add_slide(prs.slide_layouts[6])
+        group = slide.shapes.add_group_shape()
+        heading = group.shapes.add_textbox(Inches(1), Inches(0.5), Inches(6), Inches(0.5))
+        for text in ("两篇文献对照", "两篇论文的对比"):
+            with self.subTest(text=text):
+                heading.text = text
+                self.assertEqual([w["slide"] for w in check_cross_paper_scope(prs)], [1])
+        heading.text = "前作与基线对照"
+        self.assertEqual(check_cross_paper_scope(prs), [])
+        heading.text = "两篇文献对照"
+        group.top = Inches(3)
+        self.assertEqual(check_cross_paper_scope(prs), [])
+
+    def test_scope_review_skips_shapes_without_position(self):
+        prs = Presentation()
+        slide = prs.slides.add_slide(prs.slide_layouts[6])
+        connector = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, 0, 0, Inches(2), Inches(2))
+        props = connector._element.spPr
+        props.remove(props.xfrm)
+        self.assertIsNone(connector.top)
+        self.assertEqual(check_cross_paper_scope(prs), [])
 
     def test_project_content_is_reviewed_only_in_paper_scope(self):
         prs = Presentation()

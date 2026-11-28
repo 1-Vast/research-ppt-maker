@@ -28,19 +28,21 @@ METRIC_WORDS = re.compile(r"PCC|Pearson|AUROC|AUPRC|C-index|准确率|相关系�
 ARCH_WORDS = re.compile(r"架构图|架构。|模型架构|原图模型|模型结构图|architecture", re.I)
 
 
+def shape_texts(shapes):
+    for shape in shapes:
+        if shape.shape_type == 6:
+            yield from shape_texts(shape.shapes)
+        elif shape.has_text_frame and shape.text.strip():
+            yield shape.text.strip()
+        elif shape.has_table:
+            for row in shape.table.rows:
+                for cell in row.cells:
+                    if not cell.is_spanned and cell.text.strip():
+                        yield cell.text.strip()
+
+
 def slide_texts(slide):
-    def texts(shapes):
-        for shape in shapes:
-            if shape.shape_type == 6:
-                yield from texts(shape.shapes)
-            elif shape.has_text_frame and shape.text.strip():
-                yield shape.text.strip()
-            elif shape.has_table:
-                for row in shape.table.rows:
-                    for cell in row.cells:
-                        if not cell.is_spanned and cell.text.strip():
-                            yield cell.text.strip()
-    return list(texts(slide.shapes))
+    return list(shape_texts(slide.shapes))
 
 
 def normalized_segment(text):
@@ -106,13 +108,14 @@ def check_cross_paper_scope(prs, allow_cross_paper_comparison=False):
     for i, slide in enumerate(prs.slides, 1):
         title = slide.shapes.title
         titles = [title.text.strip()] if title is not None else []
-        titles.extend(shape.text.strip() for shape in slide.shapes
-                      if shape.has_text_frame and shape.top < prs.slide_height / 4)
+        header_shapes = (shape for shape in slide.shapes
+                         if shape.top is not None and shape.top < prs.slide_height / 4)
+        titles.extend(shape_texts(header_shapes))
         if any(is_cross_paper_label(t) for t in titles):
             issues.append({
                 "slide": i, "code": "possible_unrequested_cross_paper_comparison",
                 "severity": "review",
-                "detail": "Default multi-paper reports end with the final paper; verify explicit user authorization for cross-paper comparison/synthesis."
+                "detail": "Check the requested revision scope and baseline before changing an existing cross-paper page."
             })
     return issues
 
