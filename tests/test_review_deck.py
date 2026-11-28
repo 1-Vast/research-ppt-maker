@@ -16,7 +16,7 @@ from pptx import Presentation
 from pptx.util import Inches
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from review_deck import compare_decks, check_slides, check_project_scope
+from review_deck import compare_decks, check_slides, check_project_scope, check_cross_paper_scope
 
 
 def make_deck(path, duplicate=False, labelled=False, text="sample"):
@@ -37,6 +37,17 @@ def make_deck(path, duplicate=False, labelled=False, text="sample"):
 
 
 class RevisionReviewTests(unittest.TestCase):
+    def test_cross_paper_comparison_header_requires_opt_in(self):
+        prs = Presentation()
+        slide = prs.slides.add_slide(prs.slide_layouts[6])
+        label = slide.shapes.add_textbox(Inches(1), Inches(0.5), Inches(6), Inches(0.5))
+        label.text = "实验结果 / 基线对照"
+        self.assertEqual(check_cross_paper_scope(prs), [])
+        label.text = "双论文对照"
+        self.assertIn("possible_unrequested_cross_paper_comparison",
+                      {w["code"] for w in check_cross_paper_scope(prs)})
+        self.assertEqual(check_cross_paper_scope(prs, True), [])
+
     def test_project_content_is_reviewed_only_in_paper_scope(self):
         prs = Presentation()
         slide = prs.slides.add_slide(prs.slide_layouts[6])

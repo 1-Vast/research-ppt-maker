@@ -6,7 +6,7 @@
 
 **论文与项目页范围检查**：默认模式为 `paper-only`，用户要求结合当前工作，或要求保留已有混合稿的项目区时，使用 `paper-plus-project`，并在单独项目区记录实际实验来源。重点方法与辅助综述的紧凑汇报中，9–11 页预算只计论文部分；具体按 [project-progress-mode.md](project-progress-mode.md)。
 
-**多论文组会先做页数与模型图顺序审查**：按 [journal-club-density-and-figures.md](journal-club-density-and-figures.md) 写 `work/storyboard.json`（每篇 `papers[]` 记录角色、页数、总图的原始来源和核心实验），运行非阻断预警：
+**多论文组会先做页数与模型图顺序审查**：按 [journal-club-density-and-figures.md](journal-club-density-and-figures.md) 写 `work/storyboard.json`（每篇 `papers[]` 记录角色、页数、总图的原始来源和核心实验），默认不安排跨论文对照页；明确要求时记录 `cross_paper_comparison_authorized: true` 及 `cross_paper_slides`。运行非阻断预警：
 
 ```text
 python "SKILL_DIR/scripts/check_storyboard.py" "OUT/work/storyboard.json"

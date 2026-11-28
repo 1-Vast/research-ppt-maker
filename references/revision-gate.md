@@ -14,6 +14,8 @@
 
 ## 二、先出内部「故事板」，再运行 PPT 构建
 
+多论文默认逐篇独立讲解；不新增未授权的双论文对照或跨论文综合页。用户明确要求删除时，在 `revision_map` 记录删除页、页码/进度更新，并检查没有替代填充页；保留范围内各篇的前作、基线与证据。
+
 组会精讲和多论文合并时，按 [journal-club-density-and-figures.md](journal-club-density-and-figures.md) 额外记录每篇论文的 `role`、`budget`、`overview_first`（原文总模型图来源/位置）、`selected_experiments`（决定性 1–2 项）和删除项。
 
 

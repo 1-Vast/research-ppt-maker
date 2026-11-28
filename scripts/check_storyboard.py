@@ -20,6 +20,8 @@ necessary redraw-first fallback without removing overview/source checks.
 Warnings are for human decisions, never mechanical failure or proof of quality.
 Top-level scope="paper-only" (default) disallows project_slides. Project scopes
 expect a recorded user request and a source for each project slide.
+Cross-paper comparison/synthesis is opt-in: record explicit user authorization
+with cross_paper_comparison_authorized=true and list cross_paper_slides only if requested.
 Usage: python scripts/check_storyboard.py work/storyboard.json [--strict]
 """
 from __future__ import annotations
@@ -27,6 +29,8 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+
+from paper_scope import is_cross_paper_slide
 
 METHOD_TYPES = {"original-method", "method", "model"}
 REVIEW_TYPES = {"review", "perspective", "conceptual"}
@@ -71,6 +75,14 @@ def audit(data: dict) -> list[dict]:
             if not isinstance(source, str) or not source.strip():
                 warnings.append({"code": "untraceable_project_evidence", "slide": i,
                                  "detail": "Every project progress page must identify a user-provided experiment/source; do not invent results."})
+    comparison_authorized = data.get("cross_paper_comparison_authorized") is True
+    cross_paper_slides = data.get("cross_paper_slides", [])
+    if not isinstance(cross_paper_slides, list):
+        warnings.append({"code": "invalid_cross_paper_slides", "detail": "cross_paper_slides must be a list."})
+        cross_paper_slides = []
+    if cross_paper_slides and not comparison_authorized:
+        warnings.append({"code": "unrequested_cross_paper_comparison",
+                         "detail": "Multi-paper reports default to independent paper sections; omit cross-paper comparison/synthesis unless explicitly requested."})
     mode = data.get("mode", "journal-club")
     if mode not in ("journal-club", "deep-reading"):
         warnings.append({"code": "invalid_mode", "detail": "Use journal-club or deep-reading."})
@@ -102,6 +114,9 @@ def audit(data: dict) -> list[dict]:
             if not isinstance(slide, dict) or not isinstance(slide.get("purpose"), str) or not slide["purpose"].strip():
                 warnings.append({"paper": name, "slide": i, "code": "invalid_slide", "detail": "Each slide needs an object with a purpose."})
                 continue
+            if is_cross_paper_slide(slide) and not comparison_authorized:
+                warnings.append({"paper": name, "slide": i, "code": "unrequested_cross_paper_comparison",
+                                 "detail": "Remove the cross-paper comparison/synthesis unless explicitly requested; keep within-paper baselines."})
             if slide["purpose"].strip().lower() in ("project-progress", "project-experiment", "project-results"):
                 warnings.append({"paper": name, "slide": i, "code": "project_slide_under_paper",
                                  "detail": "Place user-requested project pages in project_slides so project scope and sources are checked."})
@@ -149,7 +164,7 @@ def audit(data: dict) -> list[dict]:
                       any(p.get("paper_type") in METHOD_TYPES and p.get("role") == "primary" for p in valid_papers) and
                       any(p.get("paper_type") in REVIEW_TYPES and p.get("role") == "supporting" for p in valid_papers))
     if compact and paired_default and not any(has_reason(p.get("density_reason")) for p in valid_papers):
-        total = sum(len(p["slides"]) for p in valid_papers)
+        total = sum(len(p["slides"]) for p in valid_papers) + len(cross_paper_slides)
         if total > 11:
             warnings.append({"code": "multi_paper_density", "detail": f"{total} slides; consider the 9–11 slide starting budget or record density_reason for the larger scope."})
     return warnings

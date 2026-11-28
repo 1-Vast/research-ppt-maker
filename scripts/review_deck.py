@@ -19,6 +19,8 @@ import re
 
 from pptx import Presentation
 
+from paper_scope import is_cross_paper_label
+
 
 PAPER_FIGURE_REF = re.compile(r"(?:Fig(?:ure)?\.?\s*)(\d+[a-z]?)", re.I)
 EVIDENCE_WORDS = re.compile(r"实验|证据|预测|泛化|验证|结果|性能|测试")
@@ -96,6 +98,25 @@ def check_project_scope(prs, scope="paper-only"):
     return issues
 
 
+def check_cross_paper_scope(prs, allow_cross_paper_comparison=False):
+    """Flag explicit cross-paper page headings; final human review is still needed."""
+    if allow_cross_paper_comparison:
+        return []
+    issues = []
+    for i, slide in enumerate(prs.slides, 1):
+        title = slide.shapes.title
+        titles = [title.text.strip()] if title is not None else []
+        titles.extend(shape.text.strip() for shape in slide.shapes
+                      if shape.has_text_frame and shape.top < prs.slide_height / 4)
+        if any(is_cross_paper_label(t) for t in titles):
+            issues.append({
+                "slide": i, "code": "possible_unrequested_cross_paper_comparison",
+                "severity": "review",
+                "detail": "Default multi-paper reports end with the final paper; verify explicit user authorization for cross-paper comparison/synthesis."
+            })
+    return issues
+
+
 def picture_signature(slide):
     return [(hashlib.sha256(shape.image.blob).hexdigest(),
              int(shape.left), int(shape.top), int(shape.width), int(shape.height),
@@ -160,12 +181,15 @@ def main(argv=None):
     p.add_argument("deck", type=Path)
     p.add_argument("--baseline", type=Path)
     p.add_argument("--scope", choices=("paper-only", "paper-plus-project", "project-only"), default="paper-only")
+    p.add_argument("--allow-cross-paper-comparison", action="store_true",
+                   help="Use only when the user explicitly requests cross-paper comparison or synthesis.")
     p.add_argument("--output", type=Path)
     args = p.parse_args(argv)
     new = Presentation(args.deck)
     report = {"deck": str(args.deck), "slide_count": len(new.slides), "scope": args.scope,
               "limitations": "Candidates use editable text, including group text and table cells; image text, charts and SmartArt are not read. Missing editable labels may still exist inside images. No candidate is an automatic failure or proof of scientific accuracy.",
-              "content_review_candidates": check_slides(new) + check_project_scope(new, args.scope)}
+              "content_review_candidates": check_slides(new) + check_project_scope(new, args.scope)
+              + check_cross_paper_scope(new, args.allow_cross_paper_comparison)}
     if args.baseline:
         report["revision_comparison"] = compare_decks(args.baseline, args.deck)
     output = json.dumps(report, ensure_ascii=False, indent=2)

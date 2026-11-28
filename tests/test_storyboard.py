@@ -12,6 +12,23 @@ from check_storyboard import audit
 
 
 class StoryboardTests(unittest.TestCase):
+    def test_cross_paper_comparison_is_opt_in(self):
+        paper = {"paper_type": "review", "role": "equal", "budget": 3,
+                 "slides": [{"purpose": "context"}, {"purpose": "evidence", "title": "基线对照"}]}
+        data = {"papers": [paper, dict(paper)]}
+        self.assertEqual(audit(data), [])
+        data["cross_paper_slides"] = [{"purpose": "cross-paper-comparison"}]
+        self.assertIn("unrequested_cross_paper_comparison", {w["code"] for w in audit(data)})
+        data["cross_paper_comparison_authorized"] = True
+        self.assertEqual(audit(data), [])
+
+    def test_cross_paper_heading_nested_in_a_paper_is_flagged(self):
+        data = {"papers": [{"paper_type": "review", "role": "equal", "budget": 2,
+                            "slides": [{"purpose": "context"}, {"purpose": "summary", "eyebrow": "双论文对照"}]}]}
+        self.assertIn("unrequested_cross_paper_comparison", {w["code"] for w in audit(data)})
+        data["cross_paper_comparison_authorized"] = True
+        self.assertEqual(audit(data), [])
+
     def test_project_purpose_nested_under_paper_still_warns(self):
         data = {'papers': [{'paper_type': 'review', 'role': 'supporting', 'budget': 1,
                             'slides': [{'purpose': 'project-experiment'}]}]}

@@ -13,6 +13,8 @@
 
 用户要求补背景、细讲框架和创新，或两篇都是难度相当的原始研究时，按理解障碍确定预算。可分别为两篇安排「观测任务／前作路线」和「原图全景／局部机制」，必要时拆开。增加的文字应补具体信息流、假设、关键计算或证据解读。保留精选实验规则和投影尺寸，避免用重复总结填页。
 
+**多论文的默认组织是逐篇独立讲解，不是横向比较。** 每篇独立安排核心证据和必要局限，最后一篇讲完即可结束；不自动生成双论文对照、跨论文综合总结或重复结尾页。只有用户明确要求跨论文比较或综合时，才按有意义的共同问题和可比维度增加页面，并纳入总预算。保留单篇内部的前作、实验对照与消融。
+
 **页数预算属于默认约束而非绝对上限**；不要为了达标牺牲真实实验协议、核心图、关键公式或重要科学限定。相反，不能因为论文中有三个实验就自动生成三页。多篇文献不按单篇 4–5 页简单叠加，也不固定每篇 10 页。
 
 ## 1. 原图先行：第一次讲模型整体框架，优先作者的原始总图
@@ -76,7 +78,7 @@
 - `omitted`: 删除了哪些重复模块/实验/背景、为何不会影响主线；
 - `slides`: 每页的新增知识、核心图与承载对象、上一页与下一页之间的逻辑衔接；检查器使用下方字段。
 
-供 `check_storyboard.py` 检查时，使用顶层 `papers` 数组；每篇的字段为 `name`、`paper_type`、`role`、`budget`、`available_original_overview` 和 `slides`。顶层 `mode` 为 `journal-club`（默认）或 `deep-reading`；深读不套默认实验数量与双篇页数提示，仍检查自定预算和原图计划。顶层或单篇 `density_reason` 记录合理扩大篇幅/证据范围的理由，检查器跳过对应的默认密度提示，但不跳过自定预算检查；预算调整后应同步 `budget`。单篇 `overview_reason` 记录来源或可读性等原因，允许首张总览采用重绘；仍须有总览计划，不以理由省略它。默认至多一例只针对辅助综述，9–11 页提示只针对重点方法加辅助综述的双篇组合。`paper_type` 跟随 [revision-gate.md](revision-gate.md) 的类型命名。每个 `slides` 项用 `purpose` 表示 cover / context / method-overview / mechanism / evidence 等角色，用 `visual` 区分 original-paper-figure / explainer 等；原图页的 `source` 记录图号与来源，实验证据页用 `experiment_id` 区分实验。同一实验需要多页时复用同一 ID。`overview_first`、`core_mechanisms` 等可保留为附加笔记，不能替代 `slides` 中可检查的计划。最小示例及工具覆盖范围见 [build-and-verify.md](build-and-verify.md) 的故事板检查与脚本开头示例；这些字段只描述计划，不证明已读原文或实际使用图片。
+供 `check_storyboard.py` 检查时，使用顶层 `papers` 数组；每篇的字段为 `name`、`paper_type`、`role`、`budget`、`available_original_overview` 和 `slides`。默认省略 `cross_paper_slides`；如用户明确要求跨论文比较，记录 `cross_paper_comparison_authorized: true`，并将跨论文页记录在 `cross_paper_slides`（计入总预算）。检查器不能验证授权真实性。顶层 `mode` 为 `journal-club`（默认）或 `deep-reading`；深读不套默认实验数量与双篇页数提示，仍检查自定预算和原图计划。顶层或单篇 `density_reason` 记录合理扩大篇幅/证据范围的理由，检查器跳过对应的默认密度提示，但不跳过自定预算检查；预算调整后应同步 `budget`。单篇 `overview_reason` 记录来源或可读性等原因，允许首张总览采用重绘；仍须有总览计划，不以理由省略它。默认至多一例只针对辅助综述，9–11 页提示只针对重点方法加辅助综述的双篇组合。`paper_type` 跟随 [revision-gate.md](revision-gate.md) 的类型命名。每个 `slides` 项用 `purpose` 表示 cover / context / method-overview / mechanism / evidence 等角色，用 `visual` 区分 original-paper-figure / explainer 等；原图页的 `source` 记录图号与来源，实验证据页用 `experiment_id` 区分实验。同一实验需要多页时复用同一 ID。`overview_first`、`core_mechanisms` 等可保留为附加笔记，不能替代 `slides` 中可检查的计划。最小示例及工具覆盖范围见 [build-and-verify.md](build-and-verify.md) 的故事板检查与脚本开头示例；这些字段只描述计划，不证明已读原文或实际使用图片。
 
 **任何一页未能回答“删除它会损失哪条关键理解或证据？”时，优先合并或删去。** 若一页主要内容是“重复总结”“又一项一般性能”“制作痕迹标签”，一般不该独立存在。模型总览与重要机制页例外：两者虽共享图中对象，但一页讲信息流，一页讲计算细节。
 
